@@ -22,6 +22,7 @@ import { addToWishlist } from '../../store/actions/wishlistActions';
 import FastImage from 'react-native-fast-image';
 import FilterList from '../../components/picker/FilterList';
 import StringsOfLanguages from '../../constants/StringOfLanguages';
+import { RNToasty } from 'react-native-toasty';
 
 const ProductScreen = ({navigation, route}) => {
   console.log(route);
@@ -310,8 +311,12 @@ const ProductScreen = ({navigation, route}) => {
       
         setLoading(false);
         //setAlertVisible(true);
+        RNToasty.Success({
+          title:'Product' + '  ' + responseJson.message + '  ' + 'to Cart',
+          position:'center'
+        })
        
-        Alert.alert(
+     /*   Alert.alert(
           //title
           'Success',
           //body
@@ -329,7 +334,7 @@ const ProductScreen = ({navigation, route}) => {
           ],
           {cancelable: false},
           //clicking out side of alert will not cancel
-        );
+        );*/
         //Showing response message coming from server
         console.log(responseJson);
         
@@ -363,14 +368,14 @@ const ProductScreen = ({navigation, route}) => {
   };
   const addtoWishlist=(item)=>{
     dispatch(addToWishlist(item))
-    Alert.alert(
+  /*  Alert.alert(
       //title
       'Success',
       //body
       StringsOfLanguages.addedToWishlist,
       
       //clicking out side of alert will not cancel
-    );
+    );*/
     
     
     

@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
+import { RNToasty } from 'react-native-toasty'
 import {
   View,
   StyleSheet,
@@ -73,10 +74,12 @@ const CartScreen = ({navigation}) => {
   // const use=loggedInUser()
 
   useEffect(async () => {
+     //  cartDetails();
     navigation.addListener('focus',async ()=>{
       await cartDetails();
 
     })
+   // return ()=> setCartData([]);
     // AsyncStorage.getItem
    
 
@@ -258,7 +261,8 @@ const CartScreen = ({navigation}) => {
          dispatch(incCart(cart.id,cart.productId,cart.quantity,0,null))
        
       }else{
-        alert('minimum 10 products can be added')
+        alert('maximum 10 products can be added')
+        
       }
     }else{
       let existingCart = await AsyncStorage.getItem('products').then(value => {
@@ -270,7 +274,15 @@ const CartScreen = ({navigation}) => {
         if(existingCart[index].userCart.quantity<10){
           existingCart[index].userCart.quantity+=1
         }else{
-          alert('minimum 10 products can be added')
+          RNToasty.Info({
+            title:'maximum 10 products can be added',
+            position:'center',
+            //fontFamily:'Arial'
+            
+          })
+          
+          
+          
         }
        
        
@@ -430,7 +442,7 @@ const CartScreen = ({navigation}) => {
           ListEmptyComponent={ListEmptyComponent}
           refreshing={refreshing}
           renderItem={({item}) => {
-            console.log('item' + item.userCart.price);
+         //   console.log('item' + item.userCart.price);
             // setTotal(item.userCart.total)
             let convertPrice = item.userCart.price * price;
             sum = sum + convertPrice;

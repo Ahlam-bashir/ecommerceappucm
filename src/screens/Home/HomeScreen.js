@@ -34,6 +34,7 @@ import SearchList from './Components/SearchList';
 import { EventEmitter } from 'react-native';
 import { Dimensions } from 'react-native';
 import { Keyboard } from 'react-native';
+import { getCartItems } from '../../store/actions/cartActions';
 
 const HomeScreen = ({navigation}) => {
   const dispatch = useDispatch();
@@ -64,9 +65,8 @@ const HomeScreen = ({navigation}) => {
     navigation.navigate('products', {Id: item.id, s_Id: item.superCategoryId});
   };
   useEffect(() => {
-   
-    
-    navigation.addListener('focus', async () => {
+       
+  const unsubscribe=  navigation.addListener('focus', async () => {
       await AsyncStorage.getItem('user')
         .then(value => JSON.parse(value))
         .then(response => setUser(response));
@@ -89,10 +89,13 @@ const HomeScreen = ({navigation}) => {
           console.log(err);
         });
     });
-  }, []);
+   
+      return ()=>unsubscribe
+  }, [navigation]);
   useEffect(() => {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
     dispatch(getCategories());
+    dispatch(getCartItems())
     if (cat != undefined) {
       setData(cat);
       //  setSlides(cat.slides);
@@ -151,9 +154,9 @@ const HomeScreen = ({navigation}) => {
           if (responseJson.statusCode === 200) {
             setLoading(false);
             setRefreshing(false)
-            if (responseJson.data.length > 0) {
-
-                           setOffset(offset + 1);
+            if (responseJson.data.length > 0) 
+            {  
+              setOffset(offset + 1);              
               // After the response increasing the offset
               setArrival([...arrival, ...responseJson.data]);
               //setFilteredProducts([...arrival,...responseJson.data])

@@ -18,6 +18,7 @@ import { Alert } from 'react-native'
 import { encode } from 'base-64'
 import { API_URL } from '../../utils/Config'
 import StringsOfLanguages from '../../constants/StringOfLanguages'
+import { Platform } from 'react-native'
 
 const wishlist=({navigation})=>{
     const [price,setPrice]=useState(1)
@@ -120,24 +121,26 @@ const wishlist=({navigation})=>{
             />
 
 
-                <Text type='heading' style={{color:Colors.colors.white,alignSelf:'center',marginLeft:100}}>{StringsOfLanguages.displayWishlist}</Text>
+                <Text type='heading' style={{color:Colors.colors.white,textAlign:'center',width:'90%'}}>{StringsOfLanguages.displayWishlist}</Text>
             </View>
-            <View style={{padding:12}}>
+            <View style={{padding:12,marginTop:Platform.OS!='ios'?40:null}}>
                 {wishlistItems.length!==0?
                 <>
                  <FlatList
                  showsVerticalScrollIndicator={false}
                      contentContainerStyle={{justifyContent:'center',paddingBottom:40}}
                       data={wishlistItems}
-                      keyExtractor={(index)=>index.toString()}
+                      keyExtractor={(item,index)=>index.toString()}
                       renderItem={({item})=>{
-                          console.log(item+"item")
+                          
                           
                           return(
-                             <TouchableOpacity onPress={()=>navigation.navigate('productDetails', {
+                             <TouchableOpacity
+                             key={item.wishlist.id}
+                              onPress={()=>navigation.navigate('productDetails', {
                               id: item.product.id,
                             })}>
-                                <View style={styles.listContainer} key={item.wishlist.id}>
+                                <View style={styles.listContainer} >
                                 <Image source={{uri:item.mainImage}} 
                                 resizeMode='contain'
                                 style={{width:120,height:60,}}

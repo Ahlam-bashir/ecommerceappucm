@@ -25,10 +25,9 @@ export function isPasswordValid(password) {
  * @todo Add proper validation for mobile number
  */
  export function isPhoneNumberValid(phoneNumber) {
-   const regex=/(\+\d{1,3}[- ]?)?\d{10}/
+   const regex=/(\+\d{1,3}[- ]?)?\d{5}/
     return (
-      isNonEmptyString(phoneNumber) &&
-      phoneNumber.length >= LIMITS.minPhoneNumberLength && phoneNumber.match(regex)
+       phoneNumber.length >= 5 && phoneNumber.match(regex)
     );
   }
 export function Conversion(amount,conversion){
@@ -49,20 +48,25 @@ export function roundTo(n, digits) {
 export function isNameValid(name) {
   const regex=/^[a-zA-Z ,.'-]*$/
   return (
-    isNonEmptyString(name) &&
-    name.length >= 2  &&  name.match(regex)
+    
+     name.match(regex)
   );
 }
 export function isInvalidCharacters(name) {
   const regex=/^[A-Za-z0-9 _\-.'#&]*$/
   return (
-    isNonEmptyString(name) &&
-    name.length >= 2  &&  name.match(regex)
+    isNonEmptyString(name) && name.match(regex)
   );
 }
 export function Pincode(code){
   const regex=/^[0-9a-zA-Z]*$/
   return(
-    isNonEmptyString(code) && code.match(regex) && code.length>=6
+    isNonEmptyString(code) && code.match(regex) && code.length>=4
   )
+}
+export function isMinLength(name) {
+ 
+  return (
+    name.length >= 2  
+  );
 }

@@ -19,6 +19,7 @@ import {API_URL} from '../../utils/Config';
 import {encode} from 'base-64';
 import {element} from 'prop-types';
 import StringsOfLanguages from '../../constants/StringOfLanguages';
+import { RNToasty } from 'react-native-toasty';
 
 const LoginScreen = ({navigation, route}) => {
   const [indicator, setIndicator] = useState(false);
@@ -145,23 +146,19 @@ const LoginScreen = ({navigation, route}) => {
               }
             });
           if (flag == 0) {
-            if(Platform.OS=='ios'){
-              setAlertVisible(true)
-              setAnimation(require('../../assets/images/animations/82473-login.json'))
-              setTitle('Sucessfully Logged In! ')
-              setbtntext1('')
-              setTimeout(()=>{
-                setAlertVisible(false)
-              },2000)
-  
+            
               
+              
+             
+           
+          
+            RNToasty.Success({
+              title:'Logged in Sucessfully',
+              position:'bottom'
+            })
+            
               navigation.replace('TabStack');
-            }
-            else{
-      
-              alert('Logged in Sucessfully')
-              navigation.replace('TabStack');
-            }
+            
            
            
             
@@ -184,7 +181,11 @@ const LoginScreen = ({navigation, route}) => {
 
             }else{
               setIndicator(false);
-                    alert(responseJson.Message);
+              RNToasty.Error({
+                title:responseJson.Message,
+                position:'bottom'
+              })
+                  //  alert(responseJson.Message);
             }
          
         

@@ -93,6 +93,13 @@ const MyAddresses=({navigation})=>{
               <Text type="heading" style={styles.text}>
                 My Addresses
               </Text>
+              <Icon
+                  name={'add'}
+                  size={30}
+                  color={Colors.colors.white}
+                  style={{paddingRight:6}}
+                  onPress={()=>navigation.navigate('Add Address')}
+                />
             </View>
             <Loader loading={loading}/> 
            
@@ -163,7 +170,7 @@ const styles = StyleSheet.create({
       color:Colors.colors.white,
       textAlign:'center',
       alignSelf:'center',
-      width:'80%'
+      width:'75%'
     },
     svgCurve: {
         position: 'absolute',

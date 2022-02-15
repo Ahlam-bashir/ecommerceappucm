@@ -31,6 +31,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import ReviewModal from '../../components/picker/ReviewModal';
 import { useDispatch } from 'react-redux';
 import { addToWishlist } from '../../store/actions/wishlistActions';
+import { RNToasty } from 'react-native-toasty';
 
 const ProductDetails = ({navigation, route}) => {
   const dispatch=useDispatch()
@@ -122,6 +123,7 @@ const ProductDetails = ({navigation, route}) => {
 
         console.error(error);
       });
+      return ()=>setProductDetails(null)
   }, []);
   let images=productImages.map((img)=>{
        return {url:img}
@@ -148,6 +150,7 @@ const ProductDetails = ({navigation, route}) => {
         setVisible(false);
         console.error(error);
       });
+      return ()=>setProductRating([])
      
   },[ratingsreviews])
   const details = () => {
@@ -229,7 +232,12 @@ const ProductDetails = ({navigation, route}) => {
         setbtntext1('View Cart');
       setbtntext2('Continue Shopping');
       }else{
-        Alert.alert(
+        RNToasty.Success({
+          title:'Product Added To Cart',
+          position:'center'
+
+        })
+      /*  Alert.alert(
           //title
           'Success',
           //body
@@ -247,7 +255,7 @@ const ProductDetails = ({navigation, route}) => {
           ],
           {cancelable: false},
           //clicking out side of alert will not cancel
-        );
+        );*/
        
       
       }
@@ -296,7 +304,12 @@ const ProductDetails = ({navigation, route}) => {
                setbtntext1('View Cart');
                setbtntext2('Continue Shopping');
             }else{
-              Alert.alert(
+              RNToasty.Success({
+                title:'Product Added To Cart',
+                position:'center'
+      
+              })
+            /*  Alert.alert(
                 //title
                 'Success',
                 //body
@@ -315,7 +328,7 @@ const ProductDetails = ({navigation, route}) => {
                 {cancelable: false},
                 //clicking out side of alert will not cancel
               );
-             
+             */
             
             }
             
@@ -345,14 +358,7 @@ const ProductDetails = ({navigation, route}) => {
   };
   const addtoWishlist=(item)=>{
     dispatch(addToWishlist(item))
-   Alert.alert(
-      //title
-      'Success',
-      //body
-      StringsOfLanguages.addedToWishlist,
-      
-      //clicking out side of alert will not cancel
-    );
+  
     
     
     

@@ -86,43 +86,53 @@ const PaymentScreen = ({navigation}) => {
   }, [orderId]);
 
   useEffect(async () => {
+    getAddresses()
+    navigation.addListener('focus', async () => {
+      getAddresses()
+  })
+  
+  return ()=>setAddresses([])
 
-   await AsyncStorage.getItem('user')
-      .then(value => JSON.parse(value))
-      .then(response => {
-        if (response !== null) {
-          setUser(response);
-         
-          fetch(API_URL + 'ConfirmOrder?addressId=' + addressId, {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-              Authorization:
-                'Basic ' + encode(response.email + ':' + response.password),
-            },
 
-            //Request Type
-          })
-            .then(response => response.json())
-            .then(responseJson => {
-              if (responseJson.statusCode === 200) {
-                setaddresses(responseJson.data.userAddresses);
-                setDummyArray(responseJson.data.userCarts);
-
-                //  setUserCarts(responseJson.data.userCarts)
-                setDisable(true);
-              }
-              //Success
-            })
-
-            .catch(error => {
-              //Error
-
-              console.error(error);
-            });
-        }
-      });
+  
   }, []);
+  const getAddresses=async()=>{
+    await AsyncStorage.getItem('user')
+    .then(value => JSON.parse(value))
+    .then(response => {
+      if (response !== null) {
+        setUser(response);
+       
+        fetch(API_URL + 'ConfirmOrder?addressId=' + addressId, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            Authorization:
+              'Basic ' + encode(response.email + ':' + response.password),
+          },
+
+          //Request Type
+        })
+          .then(response => response.json())
+          .then(responseJson => {
+            if (responseJson.statusCode === 200) {
+              setaddresses(responseJson.data.userAddresses);
+              setDummyArray(responseJson.data.userCarts);
+
+              //  setUserCarts(responseJson.data.userCarts)
+              setDisable(true);
+            }
+            //Success
+          })
+
+          .catch(error => {
+            //Error
+
+            console.error(error);
+          });
+      }
+    });
+  }
   useEffect(() => {
     AsyncStorage.getItem('user')
       .then(value => JSON.parse(value))
@@ -695,7 +705,7 @@ useEffect(async()=>{
             </Text>
            
              <TouchableOpacity
-             onPress={() => navigation.navigate('Add Address')}>
+            onPress={() => navigation.navigate('MyAddresses')}>
              <Text
                type="caption"
                style={{color: Colors.colors.primary, width: 100}}>

@@ -22,6 +22,7 @@ import { addToWishlist } from '../../../store/actions/wishlistActions';
 import { BASE_URL } from '../../../constants/matcher';
 import {decode} from 'html-entities';
 import { Alert } from 'react-native';
+import WishIcon from './WishlIcon';
 
 
 
@@ -50,18 +51,7 @@ const ArrivalList=(props)=>{
       let totalStars=star/item.ratings.length
     //const x= Math.round(convertPrice*100)/100
    // let x = Conversion(item.product.price, price);
-   const addtoWishlist=(item)=>{
-    dispatch(addToWishlist(item))
- /*   Alert.alert(
-      //title
-      'Success',
-      //body
-      'Product' + '  ' + 'added' + '  ' + 'to Wishlist',
-      
-      //clicking out side of alert will not cancel
-    );*/
-  }
-   
+  
     const CustomRatingBar = () => {
       return (
         <View style={styles.customRatingBarStyle}>
@@ -126,25 +116,9 @@ const ArrivalList=(props)=>{
             }}
             
           />
-              {user!=null?
-         <TouchableOpacity
-         style={{
-          height: 40,
-          width: 40,
-          borderRadius: 40 / 2,
-          backgroundColor: Colors.colors.primary,
-          alignItems:'center',
-          justifyContent:'center',
-          alignSelf: 'flex-start',
-          margin:4,
-         position:'absolute',
-          overflow:'visible'
-        }}
-        onPress={()=>addtoWishlist(item)}
-         >
-         <Icon name='hearto' type='antdesign'color={Colors.colors.white} onPress={()=>addtoWishlist(item)}/>
-         </TouchableOpacity>
-     :null}
+              {user!=null?<WishIcon item={item} user={user}/>
+        
+       :null}
           <View
             style={{
               padding: 6,

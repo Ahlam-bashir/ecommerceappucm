@@ -129,7 +129,7 @@ function WishScreenStack() {
 }
 
 const TabScreenStack = () => {
-  const carts=useSelector(state => state.cart.cartItems)
+  const carts=useSelector(state => state.cart.cartItems.length)
   
   const [user, setUser] = useState('');
   AsyncStorage.getItem('user')
@@ -181,7 +181,7 @@ const TabScreenStack = () => {
         component={CartScreenStack}
         options={{
           tabBarLabel: 'Cart',
-           tabBarBadge:  carts.length,
+           tabBarBadge:  carts,
         }}
       />
       <Tab.Screen
@@ -219,6 +219,7 @@ const AboutScreenStack = ({navigation}) => {
 };
 
 const AppNavigator = () => {
+  
   return (
     <SafeAreaProvider>
       <StatusBar backgroundColor={Colors.appbar.statusBarColor} />

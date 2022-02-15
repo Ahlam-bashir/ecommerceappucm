@@ -178,7 +178,7 @@ const MyAccount = ({navigation}) => {
                 color={Colors.colors.primary}
                 type='feather'
               />
-              <Text type="subheading">{StringsOfLanguages.SignOut}</Text>
+              <Text type="subheading" style={{width:'50%',textAlign:'center'}}>{StringsOfLanguages.SignOut}</Text>
               <Icon
                 name={'chevron-small-right'}
                 size={25}
@@ -192,7 +192,7 @@ const MyAccount = ({navigation}) => {
           <TouchableOpacity onPress={CurrencyList}>
             <View style={styles.list}>
               <Icon name={'currency-cny'} size={25} color={Colors.colors.primary} type='materialcommunity'/>
-              <Text type="subheading">{StringsOfLanguages.ChangeCurrency}</Text>
+              <Text type="subheading" style={{width:'50%',textAlign:'center'}}>{StringsOfLanguages.ChangeCurrency}</Text>
               <Icon
                 name={'chevron-small-right'}
                 size={25}
@@ -206,7 +206,7 @@ const MyAccount = ({navigation}) => {
           <TouchableOpacity onPress={changeLanguage}>
             <View style={styles.list}>
               <Icon name={'language'} size={25} color={Colors.colors.primary} />
-              <Text type="subheading">{StringsOfLanguages.ChangeLanguage}</Text>
+              <Text type="subheading" style={{width:'50%',textAlign:'center'}}>{StringsOfLanguages.ChangeLanguage}</Text>
               <Icon
                 name={'chevron-small-right'}
                 size={25}
@@ -228,7 +228,7 @@ const MyAccount = ({navigation}) => {
                     type='materialcommunity'
                     color={Colors.colors.primary}
                   />
-                  <Text type="subheading">{StringsOfLanguages.myOrders}</Text>
+                  <Text type="subheading" style={{width:'50%',textAlign:'center'}}>{StringsOfLanguages.myOrders}</Text>
                   <Icon
                     name={'chevron-small-right'}
                     size={25}
@@ -272,7 +272,7 @@ const MyAccount = ({navigation}) => {
                     size={25}
                     color={Colors.colors.primary}
                   />
-                  <Text type="subheading">My Addresses</Text>
+                  <Text type="subheading" style={{width:'50%',textAlign:'center'}}>My Addresses</Text>
                   <Icon
                     name={'chevron-small-right'}
                     size={25}
@@ -294,7 +294,7 @@ const MyAccount = ({navigation}) => {
                     color={Colors.colors.primary}
                     type='antdesign'
                   />
-                  <Text type="subheading">{StringsOfLanguages.MyWishlist}</Text>
+                  <Text type="subheading" style={{width:'50%',textAlign:'center'}}>{StringsOfLanguages.MyWishlist}</Text>
                   <Icon
                     name={'chevron-small-right'}
                     size={25}
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
 
     justifyContent: 'center',
-    marginTop: 100,
+    marginTop: 80,
   },
   circle: {
     height: 200,
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     margin: 10,
     borderRadius: 15,
-    height: 80,
+  //  height: 80,
     backgroundColor: Colors.colors.white,
     alignItems: 'center',
     justifyContent: 'space-evenly',

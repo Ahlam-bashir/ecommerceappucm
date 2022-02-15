@@ -33,8 +33,7 @@ const Alert = (props) => {
                 </View>
 
                 <AnimatedLottieView
-                style={{width:140,height:100,marginTop:10,alignSelf:'center'}}
-               
+                  style={{width:140,height:100,marginTop:10,alignSelf:'center'}}
                   source={props.uri}
                   autoPlay
                   loop

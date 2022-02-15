@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { encode } from "base-64";
+import { RNToasty } from "react-native-toasty";
 import { API_URL } from "../../utils/Config";
 import { ADD_TO_WISHLIST, GET_WISHLIST, REMOVE_FROM_CART, REMOVE_FROM_WISHLIST } from "../actionTypes";
 
@@ -117,8 +118,13 @@ export const removeFromWishlist=(itemId)=>{
             .then(async responseJson => {
               console.log(responseJson);
               if (responseJson.statusCode === 0 && responseJson.message=="added") {
-                  console.log(item)
-                  alert( 'Product' + '  ' + responseJson.message + '  ' + 'to Wishlist')
+                 RNToasty.Success({
+                   title:'Product' + '  ' + responseJson.message + '  ' + 'to Wishlist',
+                   position:'center'
+                   
+
+                 })
+                  
                 await dispatch({
                   type: ADD_TO_WISHLIST,
                    item
@@ -129,7 +135,11 @@ export const removeFromWishlist=(itemId)=>{
       
                
               }else{
-                alert(responseJson.message)
+                RNToasty.Success({
+                  title:responseJson.message
+                  
+
+                })
               }
       
               //Showing response message coming from server

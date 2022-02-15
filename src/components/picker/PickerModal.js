@@ -34,7 +34,7 @@ const PickerModal = (props) =>{
                 placeholder={'Search'}
                 onChangeText={text =>props.Search(text)}
                 placeholderTextColor={Colors.colors.gray500}
-                containerStyle={{height:40,padding:6,borderRadius:8}}
+                containerStyle={{height:40,padding:4,borderRadius:8}}
                 underlineColorAndroid={Colors.colors.transparent}
                 inputStyle={{color:Colors.colors.black,padding:8}}
                   

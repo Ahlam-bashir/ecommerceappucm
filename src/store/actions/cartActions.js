@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {encode} from 'base-64';
+import { RNToasty } from 'react-native-toasty';
+import Colors from '../../utils/Colors';
 import {API_URL} from '../../utils/Config';
 import {CLEAR_CART, REMOVE_FROM_CART, CART_ITEMS, INC_CART_QUANTITY, DEC_CART_QUANTITY, REMOVE_ALL_FROM_CART} from '../actionTypes';
 export const getCartItems = () => {
@@ -138,8 +140,13 @@ export const incCart=(cartId,productId,quantity,agentId,variationId)=>{
               });   
             }
             else if(responseJson.statusCode===201){
-              alert(responseJson.message)
+            //  alert(responseJson.message)
+            RNToasty.Info({
+              title: responseJson.message,
+              //fontFamily: 'Arial',
+              position: 'center',
 
+            })
             }
     
             //Showing response message coming from server
