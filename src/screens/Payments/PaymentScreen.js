@@ -25,6 +25,7 @@ import { Platform } from 'react-native';
 import StringsOfLanguages from '../../constants/StringOfLanguages';
 import WebView from 'react-native-webview';
 import { ActivityIndicator } from 'react-native';
+import { RNToasty } from 'react-native-toasty';
 
 const PaymentScreen = ({navigation}) => {
   const {initPaymentSheet, presentPaymentSheet} = useStripe();
@@ -276,7 +277,8 @@ useEffect(async()=>{
     }
     if (user !== null) {
       let Total = Math.round(total + grandTotal + sum, 2);
-      console.log(Total+'ttt');
+      let extension=code=="INR"?"IN":""
+      console.log(code    +  extension);
       await fetch(API_URL + 'Pay', {
         method: 'POST',
         headers: {
@@ -289,6 +291,7 @@ useEffect(async()=>{
           amount: Total,
           currency: code.toString(),
           isBuyNow: false,
+          StripeLink:extension
         }),
       })
         .then(response => response.json())
@@ -325,7 +328,7 @@ useEffect(async()=>{
   };
 
   const openPaymentSheet = async () => {
-    console.log(clientsecret);
+    console.log(clientsecret+'clientsecret');
 
     if (!clientsecret) {
       alert('select your delivery method and address');
@@ -342,6 +345,7 @@ useEffect(async()=>{
     const {error} = await presentPaymentSheet({clientsecret});
 
     if (error) {
+      
       console.log(error.localizedMessage+"error")
      // Alert.alert(`Error code: ${error.code}`, error.message);
     } else {

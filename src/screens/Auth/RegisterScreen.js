@@ -10,7 +10,7 @@ import {
 import {CustomHeader, Icon, Loader, PickerModal, Text} from '../../components';
 import TextInput from '../../components/inputText/inputText';
 import {DIMENS, TYPOGRAPHY} from '../../constants';
-import {isEmailValid, isInvalidCharacters, isMinLength, isNameValid, isNonEmptyString, isPhoneNumberValid, Pincode} from '../../utils';
+import {isEmailValid, isInvalidCharacters, isMinLength, isNameValid, isNonEmptyString, isPhoneLength, isPhoneNumberValid, Pincode} from '../../utils';
 import Colors from '../../utils/Colors';
 import Country from '../../constants/data/country.json';
 import {API_URL} from '../../utils/Config';
@@ -170,7 +170,8 @@ const RegisterScreen = ({navigation}) => {
        
 
       }
-      case isPhoneNumberValid:{
+      
+      case Pincode:{
         if (!fieldValidater(form[fieldKey])) {
           setValues(prevState => ({
             ...prevState,
@@ -183,12 +184,24 @@ const RegisterScreen = ({navigation}) => {
         
 
       }
-      case Pincode:{
+      case isPhoneLength:{
         if (!fieldValidater(form[fieldKey])) {
           setValues(prevState => ({
             ...prevState,
             [fieldErrorKey]: true,
-            [error]:'please enter valid detailss'
+            [error]:'minimum length should be 7'
+          }));
+          return false;
+        }
+        return true;
+
+      }
+      case isPhoneNumberValid:{
+        if (!fieldValidater(form[fieldKey])) {
+          setValues(prevState => ({
+            ...prevState,
+            [fieldErrorKey]: true,
+            [error]:'please enter valid number'
           }));
           return false;
         }
@@ -753,7 +766,7 @@ const RegisterScreen = ({navigation}) => {
               
                 keyboardType="number-pad"
                 inputStyle={{paddingLeft:50}}
-                maxLength={12} 
+                maxLength={16} 
                 containerStyle={
                   (Platform.OS) !== 'android' ? styles.defaultMargin : {marginTop:5,flex:0}
 
@@ -769,13 +782,20 @@ const RegisterScreen = ({navigation}) => {
                     incorrectPhone: false,
                   }))
                 }
-                onBlur={() =>
+                onBlur={() =>{
+                  checkField(
+                    'phoneNumber',
+                    'incorrectPhone',
+                    isPhoneLength,
+                    'PhoneError' 
+                  )
                   checkField(
                     'phoneNumber',
                     'incorrectPhone',
                     isPhoneNumberValid,
                     'PhoneError' 
                   )
+                }
                 }
                 underlineColorAndroid={Colors.colors.primary}
               />
@@ -828,9 +848,11 @@ const RegisterScreen = ({navigation}) => {
                   incorrectMobile: false,
                 }))
               }
-              onBlur={() =>
+              onBlur={() =>{
+                checkField('mobile', 'incorrectMobile', isPhoneLength,'mobileError')
+              
                 checkField('mobile', 'incorrectMobile', isPhoneNumberValid,'mobileError')
-              }
+              }}
               underlineColorAndroid={Colors.colors.primary}
             />
            

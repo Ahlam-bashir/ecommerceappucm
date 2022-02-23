@@ -13,6 +13,7 @@ import Colors from '../../utils/Colors';
 import {isEmailValid, isNonEmptyString} from '../../utils';
 import {API_URL} from '../../utils/Config';
 import {SafeAreaView} from 'react-native';
+import { RNToasty } from 'react-native-toasty';
 
 const ForgetPassword = ({navigation}) => {
   const [form, setValues] = useState({
@@ -65,21 +66,38 @@ const ForgetPassword = ({navigation}) => {
             ...prevState,
             loading: false,
           }));
-          if (Platform.OS !== 'ios') {
-            ToastAndroid.showWithGravity(
-              responseJson.status,
-              ToastAndroid.SHORT, //can be SHORT, LONG
-              ToastAndroid.BOTTOM, //can be TOP, BOTTON, CENTER
-            );
-          } else {
-            alert(responseJson.status);
-          }
-        } else {
+        
+            RNToasty.Error({
+              title:responseJson.status,
+              position:'center'
+            })
+           
+         
+        } else if(responseJson.status==500) {
           setValues(prevState => ({
             ...prevState,
             loading: false,
           }));
-          alert(responseJson.extra + '  ' + 'to your registered email');
+          RNToasty.Error({
+            title:responseJson.extra + '  ' + 'to your registered email',
+            position:'center',
+            
+            
+          })
+          
+         
+        }else{
+          setValues(prevState => ({
+            ...prevState,
+            loading: false,
+          }));
+          RNToasty.Success({
+            title:responseJson.extra + '  ' + 'to your registered email',
+            position:'center',
+            
+            
+          },5000)
+          
           navigation.replace('Login Screen');
         }
 

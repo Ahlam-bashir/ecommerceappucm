@@ -25,9 +25,9 @@ export function isPasswordValid(password) {
  * @todo Add proper validation for mobile number
  */
  export function isPhoneNumberValid(phoneNumber) {
-   const regex=/(\+\d{1,3}[- ]?)?\d{5}/
+   const regex=/(\+\d{1,3}[- ]?)?\d{7}/
     return (
-       phoneNumber.length >= 5 && phoneNumber.match(regex)
+       phoneNumber.match(regex)
     );
   }
 export function Conversion(amount,conversion){
@@ -69,4 +69,10 @@ export function isMinLength(name) {
   return (
     name.length >= 2  
   );
+}
+export function isPhoneLength(number){
+
+  return (
+    number.length>=7
+  )
 }

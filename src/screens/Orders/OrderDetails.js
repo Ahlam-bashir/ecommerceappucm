@@ -5,7 +5,7 @@ import {element} from 'prop-types';
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native';
 import {FlatList} from 'react-native';
-import {View, StyleSheet, Image, ScrollView} from 'react-native';
+import {View, StyleSheet, Image, ScrollView,TouchableOpacity} from 'react-native';
 import {CustomHeader, Icon, Loader, Text} from '../../components';
 import {DIMENS} from '../../constants';
 import {Conversion} from '../../utils';
@@ -60,7 +60,7 @@ const OrderDetails = ({navigation, route}) => {
               setItems(responseJson.data.allItems);
               setTracking(responseJson.data.tracking);
               //Showing response message coming from server
-              console.log(responseJson.data.tracking);
+             
 
               //setorders(responseJson.data)
               // setLoading(false)
@@ -75,14 +75,48 @@ const OrderDetails = ({navigation, route}) => {
         }
       });
   };
+  const renderItem=({item})=>{
+    let convertPrice = item.OrderItems.Products.price * price;
+    return (
+      <TouchableOpacity   onPress={() =>
+        navigation.navigate('productDetails', {
+          id: item.OrderItems.Products.id,
+        })
+      }>
+      <View
+        style={{
+          width: 180,
+          borderRadius: 6,
+          backgroundColor: Colors.colors.white,
+          margin: 4,
+          padding: 8,
+        }}>
+        <Image
+          style={{height: 200, width: 160, borderRadius: 16}}
+          resizeMode="contain"
+          source={{uri: item.mainImage}}
+        />
+        <View style={{padding: 4}}>
+          <Text type="caption">
+            {item.OrderItems.Products.name}
+          </Text>
+          <Text type="caption">
+            Price: {decode(symbol) + Math.round(convertPrice, 2)}
+          </Text>
+          <Text type="caption">
+            Quantity: {item.OrderItems.quantity}
+          </Text>
+        </View>
+      </View>
+      </TouchableOpacity>
+    );
+ 
+  }
 
   return (
-    <SafeAreaView>
-      <ScrollView>
-        <View style={styles.main}>
-          <CustomHeader customStyles={styles.svgCurve} />
-          <Loader loading={loading} />
-          <View style={styles.header}>
+    <SafeAreaView style={{flex:1}}>
+       <CustomHeader customStyles={styles.svgCurve} />
+       <View style={styles.header}>
             <Icon
               name="arrowleft"
               color={Colors.colors.white}
@@ -102,48 +136,29 @@ const OrderDetails = ({navigation, route}) => {
             </Text>
           </View>
 
-          <View style={{marginTop: 20}}>
+      <ScrollView>
+     
+        <View style={styles.main}>
+          
+          <Loader loading={loading} />
+         
+          <View style={{marginTop: 6}}>
             <FlatList
               horizontal={true}
               data={items}
               showsHorizontalScrollIndicator={false}
               keyExtractor={(id, index) => index.toString()}
-              renderItem={({item}) => {
-                let convertPrice = item.OrderItems.Products.price * price;
-                return (
-                  <View
-                    style={{
-                      width: 180,
-                      borderRadius: 16,
-                      backgroundColor: Colors.colors.white,
-                      margin: 6,
-                      padding: 4,
-                    }}>
-                    <Image
-                      style={{height: 200, width: 160, borderRadius: 16}}
-                      resizeMode="contain"
-                      source={{uri: item.mainImage}}
-                    />
-                    <View style={{padding: 4}}>
-                      <Text type="caption">
-                        {item.OrderItems.Products.name}
-                      </Text>
-                      <Text type="caption">
-                        Price: {decode(symbol) + Math.round(convertPrice, 2)}
-                      </Text>
-                    </View>
-                  </View>
-                );
-              }}
+              renderItem={renderItem}
             />
           </View>
           <View
             style={{
-              marginTop: 20,
+              marginTop: 10,
               alignItems: 'center',
               //height: (DIMENS.common.WINDOW_HEIGHT * 1) / 2,
               backgroundColor: Colors.colors.white,
               padding: 8,
+              borderRadius:6
             }}>
             <View style={styles.details}>
               <Text type="caption">Order No:</Text>
@@ -204,6 +219,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
+    padding:8
   },
   svgCurve: {
     position: 'absolute',

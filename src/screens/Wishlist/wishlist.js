@@ -19,6 +19,7 @@ import { encode } from 'base-64'
 import { API_URL } from '../../utils/Config'
 import StringsOfLanguages from '../../constants/StringOfLanguages'
 import { Platform } from 'react-native'
+import { RNToasty } from 'react-native-toasty'
 
 const wishlist=({navigation})=>{
     const [price,setPrice]=useState(1)
@@ -71,9 +72,13 @@ const wishlist=({navigation})=>{
             .then(responseJson => {
             
               setLoading(false);
+              RNToasty.Success({
+                title:'Product' + '  ' + responseJson.message + '  ' + 'to Cart',
+                position:'center'
+              })
               //setAlertVisible(true);
              
-              alert('Product' + '  ' + responseJson.message + '  ' + 'to Cart',)
+             // alert()
               //Showing response message coming from server
               console.log(responseJson);
               

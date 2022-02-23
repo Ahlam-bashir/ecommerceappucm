@@ -23,6 +23,7 @@ import FastImage from 'react-native-fast-image';
 import FilterList from '../../components/picker/FilterList';
 import StringsOfLanguages from '../../constants/StringOfLanguages';
 import { RNToasty } from 'react-native-toasty';
+import { useCallback } from 'react';
 
 const ProductScreen = ({navigation, route}) => {
   console.log(route);
@@ -55,8 +56,14 @@ const ProductScreen = ({navigation, route}) => {
     }
     else{
       getSubCategory()
-      console.log("subcategory")
+     
     }
+    return ()=>{
+      setData([])
+      setarrayholder([])
+
+    }
+
   }, []);
   useEffect(async () => {
    await AsyncStorage.getItem('user')
@@ -210,8 +217,8 @@ const ProductScreen = ({navigation, route}) => {
     );
   };
   const searchData = text => {
-    console.log(text);
     if (text) {
+      setSearchText(text)
       fetch(API_URL + 'SearchProduct?searchQuery=' + text + '&&page=' + 1)
         .then(response => response.json())
         .then(responseJson => {
@@ -222,6 +229,7 @@ const ProductScreen = ({navigation, route}) => {
           console.log(error);
         });
     } else {
+      setSearchText(text)
       getCategoryData();
     }
   };
@@ -396,7 +404,9 @@ const ProductScreen = ({navigation, route}) => {
       .then(response => response.json())
 
       .then(responseJson => {
+        console.log(responseJson)
         if(responseJson.statusCode==200){
+         
           if(responseJson.data.length!==0){
             setData(responseJson.data);
 
@@ -419,6 +429,115 @@ const ProductScreen = ({navigation, route}) => {
     )
     
   }
+  const renderProducts=useCallback(({item})=>{
+    
+      const name =
+      item.product.name.length > 20
+        ? item.product.name.substring(0, 20) + '...'
+        : item.product.name;
+    let convertPrice = item.product.price * price;
+    const dp = (convertPrice * item.product.discount) / 100;
+    const newPrice = convertPrice - dp;
+
+    return (
+      <View style={styles.productContainer}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('productDetails', {
+              id: item.product.id,
+            })
+          }>
+          <FastImage
+            source={{uri: item.mainImage.replace('~', BASE_URL),
+            cache: FastImage.cacheControl.immutable,
+          }
+            
+          }
+            resizeMode={FastImage.resizeMode.contain}
+            style={{width: '100%', height: 160, borderRadius: 15}}
+            
+          />
+          {user!=null?
+           <TouchableOpacity
+           style={{
+            height: 40,
+            width: 40,
+            borderRadius: 40 / 2,
+            backgroundColor: Colors.colors.primary,
+            alignItems:'center',
+            justifyContent:'center',
+            alignSelf: 'flex-start',
+            position:'absolute'
+          }}
+          onPress={()=>addtoWishlist(item)}
+           >
+           <Icon name='hearto' type='antdesign'color={Colors.colors.white} onPress={()=>addtoWishlist(item)}/>
+           </TouchableOpacity>
+       :null}
+          
+        </TouchableOpacity>
+        <TouchableOpacity style={{
+            height: 40,
+            width: 40,
+            borderRadius: 40 / 2,
+            backgroundColor: Colors.colors.primary,
+            alignSelf: 'flex-end',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onPress={() => addtProductToCart(item)}
+          >
+          
+          <Icon
+            name="add-shopping-cart"
+            size={20}
+            color={Colors.colors.white}
+            onPress={() => addtProductToCart(item)}
+          />
+       </TouchableOpacity>
+        <View
+          style={{
+            backgroundColor: Colors.colors.white,
+            height: 80,
+            padding: 2,
+          }}>
+          <Text type="body" style={{width: 120, fontSize: 15}}>
+            {name}
+          </Text>
+          {item.product.discount > 0 ? (
+            <View style={{flexDirection: 'row'}}>
+              <Text
+                type="caption"
+                style={{
+                  fontSize: 14,
+                  color: Colors.colors.primary,
+                  textDecorationLine: 'line-through',
+                  padding: 4,
+                }}>
+                {decode(symbol) + convertPrice.toFixed(2)}
+              </Text>
+              <Text
+                type="caption"
+                style={{
+                  fontSize: 14,
+                  color: Colors.colors.primary,
+                  padding: 4,
+                }}>
+                {decode(symbol) + newPrice.toFixed(2)}
+              </Text>
+            </View>
+          ) : (
+            <Text
+              type="caption"
+              style={{fontSize: 14, color: Colors.colors.primary}}>
+              {decode(symbol) + convertPrice.toFixed(2)}
+            </Text>
+          )}
+        </View>
+      </View>
+
+    )
+  },[offset])
   return (
     <SafeAreaView style={{flex:1}}> 
     <CustomHeader customStyles={styles.svgCurve} />
@@ -438,11 +557,12 @@ const ProductScreen = ({navigation, route}) => {
           />
           <View style={styles.searchItem}>
             <TextInput
-              //value={searchText}
-              style={{padding:8}}
+              value={searchText}
+              style={{padding:8,width:'89%'}}
               placeholder={'Search here'}
               onChangeText={text => searchData(text)}
               placeholderTextColor={Colors.colors.gray500}
+              onSubmitEditing={()=>setSearchText('')}
             />
             <Icon name="search" color={Colors.colors.gray500} size={20} />
           </View>
@@ -461,12 +581,7 @@ const ProductScreen = ({navigation, route}) => {
             onPress={()=>setFilterOpen(true)}
             style={{marginLeft:2}}
           />
-        </View>
-       
-       
-      
-       
-       
+        </View>   
         <View style={{paddingBottom:40}}>
         {loading?<Loader loading={loading}/>:null}
          <FlatList
@@ -476,113 +591,7 @@ const ProductScreen = ({navigation, route}) => {
          numColumns={2}
          ListEmptyComponent={ListEmptyComponent}
          ListFooterComponent={renderFooter}
-         renderItem={({item}) => {
-           const name =
-             item.product.name.length > 20
-               ? item.product.name.substring(0, 20) + '...'
-               : item.product.name;
-           let convertPrice = item.product.price * price;
-           const dp = (convertPrice * item.product.discount) / 100;
-           const newPrice = convertPrice - dp;
-
-           return (
-             <View style={styles.productContainer}>
-               <TouchableOpacity
-                 onPress={() =>
-                   navigation.navigate('productDetails', {
-                     id: item.product.id,
-                   })
-                 }>
-                 <FastImage
-                   source={{uri: item.mainImage.replace('~', BASE_URL),
-                   cache: FastImage.cacheControl.immutable,
-                 }
-                   
-                 }
-                   resizeMode={FastImage.resizeMode.contain}
-                   style={{width: '100%', height: 160, borderRadius: 15}}
-                   
-                 />
-                 {user!=null?
-                  <TouchableOpacity
-                  style={{
-                   height: 40,
-                   width: 40,
-                   borderRadius: 40 / 2,
-                   backgroundColor: Colors.colors.primary,
-                   alignItems:'center',
-                   justifyContent:'center',
-                   alignSelf: 'flex-start',
-                   position:'absolute'
-                 }}
-                 onPress={()=>addtoWishlist(item)}
-                  >
-                  <Icon name='hearto' type='antdesign'color={Colors.colors.white} onPress={()=>addtoWishlist(item)}/>
-                  </TouchableOpacity>
-              :null}
-                 
-               </TouchableOpacity>
-               <TouchableOpacity style={{
-                   height: 40,
-                   width: 40,
-                   borderRadius: 40 / 2,
-                   backgroundColor: Colors.colors.primary,
-                   alignSelf: 'flex-end',
-                   alignItems: 'center',
-                   justifyContent: 'center',
-                 }}
-                 onPress={() => addtProductToCart(item)}
-                 >
-                 
-                 <Icon
-                   name="add-shopping-cart"
-                   size={20}
-                   color={Colors.colors.white}
-                   onPress={() => addtProductToCart(item)}
-                 />
-              </TouchableOpacity>
-               <View
-                 style={{
-                   backgroundColor: Colors.colors.white,
-                   height: 80,
-                   padding: 2,
-                 }}>
-                 <Text type="body" style={{width: 120, fontSize: 15}}>
-                   {name}
-                 </Text>
-                 {item.product.discount > 0 ? (
-                   <View style={{flexDirection: 'row'}}>
-                     <Text
-                       type="caption"
-                       style={{
-                         fontSize: 14,
-                         color: Colors.colors.primary,
-                         textDecorationLine: 'line-through',
-                         padding: 4,
-                       }}>
-                       {decode(symbol) + convertPrice.toFixed(2)}
-                     </Text>
-                     <Text
-                       type="caption"
-                       style={{
-                         fontSize: 14,
-                         color: Colors.colors.primary,
-                         padding: 4,
-                       }}>
-                       {decode(symbol) + newPrice.toFixed(2)}
-                     </Text>
-                   </View>
-                 ) : (
-                   <Text
-                     type="caption"
-                     style={{fontSize: 14, color: Colors.colors.primary}}>
-                     {decode(symbol) + convertPrice.toFixed(2)}
-                   </Text>
-                 )}
-               </View>
-             </View>
-           );
-         }}
+         renderItem={renderProducts}
          onEndReached={getData}
          onEndReachedThreshold={0.5}
        />

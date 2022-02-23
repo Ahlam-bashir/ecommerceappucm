@@ -31,10 +31,10 @@ import {Alert} from 'react-native';
 import StringsOfLanguages from '../../constants/StringOfLanguages';
 import ArrivalList from './Components/ArrivalList';
 import SearchList from './Components/SearchList';
-import { EventEmitter } from 'react-native';
-import { Dimensions } from 'react-native';
-import { Keyboard } from 'react-native';
-import { getCartItems } from '../../store/actions/cartActions';
+import {EventEmitter} from 'react-native';
+import {Dimensions} from 'react-native';
+import {Keyboard} from 'react-native';
+import {getCartItems} from '../../store/actions/cartActions';
 
 const HomeScreen = ({navigation}) => {
   const dispatch = useDispatch();
@@ -50,23 +50,112 @@ const HomeScreen = ({navigation}) => {
   const [symbol, setSymbol] = useState(decode('&#X0024;'));
   const [superCategories, setSuperCategories] = useState([]);
   const [user, setUser] = useState(null);
-  const [focus,setFocus]=useState(false)
+  const [focus, setFocus] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [filteredProducts,setFilteredProducts]=useState([])
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [
     onEndReachedCalledDuringMomentum,
     setonEndReachedCalledDuringMomentum,
   ] = useState(true);
-  
-
-  
-  const onItemClick = item => {
-    navigation.navigate('products', {Id: item.id, s_Id: item.superCategoryId});
-  };
-  useEffect(() => {
+  useEffect(async()=>{
+    await AsyncStorage.getItem('currency').then(value=>JSON.parse(value)).then(async json => {
        
-  const unsubscribe=  navigation.addListener('focus', async () => {
+          
+      if(json==null){
+       
+       await fetch(
+          'https://v6.exchangerate-api.com/v6/ea700af3fe0bdb8f9a17fd5a/enriched/USD/INR',
+          {},
+        )
+          .then(response => response.json())
+          .then(async responseJson => {
+            console.log(responseJson + 'gfgfhhg')
+            setPrice(responseJson.conversion_rate);
+            setSymbol(
+              String.fromCharCode(
+                parseInt(responseJson.target_data.display_symbol, 16),
+              ),
+            );
+           
+           
+            //Showing response message coming from server
+            
+          await  AsyncStorage.setItem('currency', JSON.stringify(responseJson));    
+          })
+          .catch(error => {
+            //display error message
+            // setLoading(false)
+  
+            console.warn(error);
+          });
+  
+      }else if(json!==null){
+        setPrice(json.conversion_rate);
+        //   console.log(
+        //     json.time_last_update_utc + ' ' + json.time_next_update_utc,
+        //  );
+        setSymbol(
+          String.fromCharCode(
+            parseInt(json.target_data.display_symbol, 16),
+          ),
+        );
+      }else if(json.target_code=="INR"){
+        setPrice(json.conversion_rate);
+        //   console.log(
+        //     json.time_last_update_utc + ' ' + json.time_next_update_utc,
+        //  );
+        setSymbol(
+          String.fromCharCode(
+            parseInt(json.target_data.display_symbol, 16),
+          ),
+        );
+       
+
+      }
+     
+     
+     
+     //  setSymbol('&#X' + json.target_data.display_symbol + ';');
+    
+  })
+  .catch(error => {
+    console.log('ghj'+error);
+  });;
+  
+  
+   },[])
+   const _keyboardDidShow = useCallback(() => {
+    navigation.setOptions({
+      tabBarVisible: false,
+    });
+   
+  }, [navigation]);
+
+  const _keyboardDidHide = useCallback(() => {
+    navigation.setOptions({
+      tabBarVisible: true,
+    });
+   
+  }, [navigation]);
+
+  useEffect(() => {
+    Keyboard.addListener('keyboardDidShow', _keyboardDidShow);
+    Keyboard.addListener('keyboardDidHide', _keyboardDidHide);
+
+    // cleanup function
+    return () => {
+      Keyboard.removeAllListeners('keyboardDidShow', _keyboardDidShow);
+      Keyboard.removeAllListeners('keyboardDidHide', _keyboardDidHide);
+    };
+  }, [_keyboardDidHide, _keyboardDidShow]);
+
+  useEffect(async() => {
+       
+    const unsubscribe = navigation.addListener('focus', async () => {
+      closeList()
+     
+      
       await AsyncStorage.getItem('user')
         .then(value => JSON.parse(value))
         .then(response => setUser(response));
@@ -80,22 +169,31 @@ const HomeScreen = ({navigation}) => {
             //   console.log(
             //     json.time_last_update_utc + ' ' + json.time_next_update_utc,
             //  );
-            setSymbol(String.fromCharCode(parseInt(json.target_data.display_symbol, 16)))
-       
-           // setSymbol('&#X' + json.target_data.display_symbol + ';');
+            setSymbol(
+              String.fromCharCode(
+                parseInt(json.target_data.display_symbol, 16),
+              ),
+            );
+
+            // setSymbol('&#X' + json.target_data.display_symbol + ';');
           }
         })
         .catch(err => {
           console.log(err);
         });
+       
     });
-   
-      return ()=>unsubscribe
+    unsubscribe
+      
+  
+    return () =>
+      
+      unsubscribe;
   }, [navigation]);
   useEffect(() => {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
     dispatch(getCategories());
-    dispatch(getCartItems())
+    dispatch(getCartItems());
     if (cat != undefined) {
       setData(cat);
       //  setSlides(cat.slides);
@@ -108,9 +206,9 @@ const HomeScreen = ({navigation}) => {
   }, [cat]);
   useEffect(() => {
     getData();
-    return () => {setArrival([])
-      setFilteredProducts([])
-
+    return () => {
+      setArrival([]);
+      setFilteredProducts([]);
     };
   }, []);
   let slidesArray = [];
@@ -126,7 +224,7 @@ const HomeScreen = ({navigation}) => {
         .then(response => response.json())
         .then(responseJson => {
           console.log(responseJson);
-          setFilteredProducts(responseJson.data)
+          setFilteredProducts(responseJson.data);
           //setArrival(responseJson.data);
           //setSearchText(text);
         })
@@ -139,8 +237,7 @@ const HomeScreen = ({navigation}) => {
     }
   };
   const getData = () => {
-    console.log(isListEnd);
-    console.log(loading);
+    
     if (!loading && !isListEnd) {
       setLoading(true);
 
@@ -153,16 +250,15 @@ const HomeScreen = ({navigation}) => {
         .then(responseJson => {
           if (responseJson.statusCode === 200) {
             setLoading(false);
-            setRefreshing(false)
-            if (responseJson.data.length > 0) 
-            {  
-              setOffset(offset + 1);              
+            setRefreshing(false);
+            if (responseJson.data.length > 0) {
+              setOffset(offset + 1);
               // After the response increasing the offset
               setArrival([...arrival, ...responseJson.data]);
               //setFilteredProducts([...arrival,...responseJson.data])
               setLoading(false);
             } else {
-              setRefreshing(false)
+              setRefreshing(false);
               setIsListEnd(true);
               setLoading(false);
             }
@@ -172,7 +268,7 @@ const HomeScreen = ({navigation}) => {
         })
 
         .catch(error => {
-          setRefreshing(false)
+          setRefreshing(false);
           //Error
           setLoading(false);
           console.error(error);
@@ -186,17 +282,20 @@ const HomeScreen = ({navigation}) => {
       item.slides.forEach(slide => {
         slidesArray.push(slide.replace('~', BASE_URL));
       });
-
+      const onItemClick = item => {
+        navigation.navigate('products', {Id: item.id, s_Id: item.superCategoryId});
+      };
+     
     return (
       <View>
         <SliderBox
           key={slidesArray.id}
           images={slidesArray}
           sliderBoxHeight={140}
-          
           resizeMethod={'resize'}
           resizeMode={'contain'}
           autoplay
+          
           onCurrentImagePressed={index => bannerClick(index)}
           dotColor={Colors.colors.primary}
           inactiveDotColor={Colors.colors.gray400}
@@ -228,7 +327,7 @@ const HomeScreen = ({navigation}) => {
             scrollEventThrottle={1}
             onScroll={Animated.event(
               [{nativeEvent: {contentOffset: {x: scrollX}}}],
-              {useNativeDriver: false}, //
+              {useNativeDriver: true}, //
             )}>
             {item !== null &&
               item.categories !== undefined &&
@@ -241,6 +340,7 @@ const HomeScreen = ({navigation}) => {
 
                 return (
                   <TouchableOpacity
+                  
                     onPress={() => onItemClick(slide)}
                     style={{alignItems: 'center'}}
                     key={slide.id}>
@@ -302,50 +402,52 @@ const HomeScreen = ({navigation}) => {
     return (
       // Footer View with Loader
       <View style={styles.footer}>
-        {loading ? <ActivityIndicator
-           animating={true}
-           color={Colors.colors.primary}
-           size={'large'}
-        /> : null}
+        {loading ? (
+          <ActivityIndicator
+            animating={true}
+            color={Colors.colors.primary}
+            size={'large'}
+          />
+        ) : null}
       </View>
     );
   };
 
   const bannerClick = index => {
     if (index === 0) {
-     // navigation.navigate('DiscountsScreen');
-     // console.log(index);
+      // navigation.navigate('DiscountsScreen');
+      // console.log(index);
     }
   };
-  const renderArrival = ({item}) => (
-    <ArrivalList
-      item={item}
-      navigation={navigation}
-      user={user}
-      price={price}
-      symbol={symbol}
-    />
-  );
-const openList=()=>{
-  setFocus(true)
+  const renderArrival =useCallback(({item}) => {
+    return(
+      <ArrivalList
+        item={item}
+        navigation={navigation}
+        user={user}
+        price={price}
+        symbol={symbol}
+      />
+    )
+  },[price,symbol,user])
   
-}
-const onRefresh = () => {
-  //set isRefreshing to true
-  setRefreshing(true);
-  getData()
-//  cartDetails();
-  // and set isRefreshing to false at the end of your callApiMethod()
-};
-const closeList=()=>{
-  Keyboard.dismiss()
-  setSearchText('')
-  setFocus(false)
-}
+  const openList = () => {
+    setFocus(true);
+  };
+  const onRefresh = () => {
+    //set isRefreshing to true
+    setRefreshing(true);
+    getData();
+    //  cartDetails();
+    // and set isRefreshing to false at the end of your callApiMethod()
+  };
+  const closeList = () => {
+    Keyboard.dismiss();
+    setSearchText('');
+    setFocus(false);
+  };
   return (
-    <SafeAreaView
-    
-    >
+    <SafeAreaView>
       <CustomHeader customStyles={styles.svgCurve} />
 
       <View style={styles.main}>
@@ -364,54 +466,56 @@ const closeList=()=>{
           />
           <View style={styles.searchItem}>
             <InputText
-                onFocus={openList}
-               
-                placeholder={'What you want to buy'}
-                onChangeText={text => {
-                 setFocus(true)
-                  setSearchText(text)
-                 searchData(text);
+              onFocus={openList}
+              placeholder={'What you want to buy'}
+              onChangeText={text => {
+                setFocus(true);
+                setSearchText(text);
+                searchData(text);
               }}
-              inputStyle={{color:Colors.colors.black}}
+              inputStyle={{color: Colors.colors.black}}
               placeholderTextColor={Colors.colors.gray500}
               underlineColorAndroid={Colors.colors.transparent}
               value={searchText}
-             
             />
-            {focus==true? <Icon name="close" color={Colors.colors.gray500} size={20}  onPress={closeList}/>:
-             <Icon name="search" color={Colors.colors.gray500} size={20} />
-            }
-           
+            {focus == true ? (
+              <Icon
+                name="close"
+                color={Colors.colors.gray500}
+                size={20}
+                onPress={closeList}
+              />
+            ) : (
+              <Icon name="search" color={Colors.colors.gray500} size={20} />
+            )}
           </View>
         </View>
-        {focus==true?(
-           <SearchList
-           searchProducts={filteredProducts}
-           navigation={navigation}
-           />
-       
-        ):(
-           <View style={styles.arrivalContainer}>
-          <View
-            style={{
-              paddingBottom: 160,
-              flexGrow: 1,
-              backgroundColor: Colors.colors.white,
-              padding: 10,
-            }}>
-            <FlatList
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              data={[data]}
-              renderItem={ListComponentHeader}
-              keyExtractor={(item, index) => index.toString()}
-              showsVerticalScrollIndicator={false}
-            />
+        {focus == true ? (
+          <SearchList
+            searchProducts={filteredProducts}
+            navigation={navigation}
+          />
+        ) : (
+          <View style={styles.arrivalContainer}>
+            <View
+              style={{
+                paddingBottom: 160,
+                flexGrow: 1,
+                backgroundColor: Colors.colors.white,
+                padding: 10,
+              }}>
+              <FlatList
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                data={[data]}
+                renderItem={ListComponentHeader}
+                keyExtractor={(item, index) => index.toString()}
+                showsVerticalScrollIndicator={false}
+              />
+            </View>
           </View>
-        </View>
-      )}
-
-       </View>
+        )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -484,6 +588,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
-    height:60
+    height: 60,
   },
 });

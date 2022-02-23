@@ -1,18 +1,19 @@
+import React,{useState} from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { encode } from 'base-64';
-import React,{useState} from 'react'
-import { KeyboardAvoidingView } from 'react-native';
-import { Platform ,TouchableOpacity} from 'react-native';
-import { StyleSheet } from 'react-native';
-import {View} from 'react-native'
+import { Platform ,TouchableOpacity, StyleSheet,View,KeyboardAvoidingView} from 'react-native';
+
+
 import { BottomSheet } from 'react-native-btr';
 import { InputText } from '..';
 import Colors from '../../utils/Colors';
 import { API_URL } from '../../utils/Config';
 import Icon from '../Icon/Icon';
 import Text from '../Text/text';
+import { RNToasty } from 'react-native-toasty';
 
 const ReviewModal=(props)=>{
+     
   const [defaultRating, setDefaultRating] = useState(1);
   const [review,setReview]=useState('')
   // To set the max number of Stars
@@ -53,16 +54,21 @@ const ReviewModal=(props)=>{
                 Object.entries(responseJson.ModelState).forEach(([key, value]) => {
                   console.log(`${key}: ${value}`);
                   if (Object.entries(value).length !== 0) {
-                  
-                      alert(
-                        value.toString() + ' ' + 'at' + ' ' + key,
-                        //can be TOP, BOTTON, CENTER
-                      );
+                  RNToasty.Error({
+                    title: value.toString() + ' ' + 'at' + ' ' + key,
+                    position:'center'
+                  })
+                      
                    
                 
                     }})}
                     else{
-                      alert(responseJson.Message);
+                      RNToasty.Success({
+                        title: responseJson.message,
+                        position:'center'
+                      })
+                      toggleBottomNavigationView()
+                      
                     }
                       
              
@@ -95,7 +101,7 @@ const ReviewModal=(props)=>{
                 <TouchableOpacity
                   
                   activeOpacity={0.6}
-                  key={item}
+                  key={key}
                   onPress={() => setDefaultRating(item)}>
                   
                   <Icon
@@ -118,6 +124,7 @@ const ReviewModal=(props)=>{
       };
     return(
         <BottomSheet
+          
           visible={visible}
           //setting the visibility state of the bottom shee
           onBackButtonPress={toggleBottomNavigationView}
@@ -125,7 +132,7 @@ const ReviewModal=(props)=>{
           onBackdropPress={toggleBottomNavigationView}
           //Toggling the visibility state
         >
-          {/*Bottom Sheet inner View*/}
+         
           <KeyboardAvoidingView
            behavior={Platform.OS === "ios" ? "padding" : null}
            keyboardVerticalOffset={Platform.OS === "ios" ? 16 : 0}

@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState,useContext} from 'react';
 import {
   View,
   StyleSheet,
@@ -15,6 +15,10 @@ import Currency from '../../constants/data/currency.json';
 import LanguageList from '../../components/picker/languageList';
 import StringsOfLanguages from '../../constants/StringOfLanguages';
 
+import RNRestart from 'react-native-restart';
+import { Context } from '../../../App';
+
+
 const MyAccount = ({navigation}) => {
   const [user, setUser] = useState(null);
   const [visible, setVisible] = useState(false);
@@ -25,6 +29,7 @@ const MyAccount = ({navigation}) => {
   const [btntext2, setbtntext2] = useState('');
   const [alertVisible, setAlertVisible] = useState(false);
   const [open,setOpen]=useState(false)
+  const {setValue} =useContext(Context);
   
 
   
@@ -36,7 +41,8 @@ const MyAccount = ({navigation}) => {
     })
    
     });
-  }, [user, navigation]);
+    return ()=>setUser(null)
+  }, [navigation]);
   const viewScreen = id => {
     console.log(id);
 
@@ -80,13 +86,13 @@ const MyAccount = ({navigation}) => {
         .then(async responseJson => {
           console.log(responseJson)
           //Showing response message coming from server
-          console.log(
-            responseJson.time_last_update_utc +
-              ' ' +
-              responseJson.time_next_update_utc,
-          );
+          
         await  AsyncStorage.setItem('currency', JSON.stringify(responseJson));
-          // CodePush.restartApp()
+        setValue(JSON.stringify(responseJson));
+
+      // RNRestart.Restart();
+          //CodePush.restartApp()
+        
           // alert(responseJson.message)
           // setLoading(false)
         })
@@ -262,27 +268,6 @@ const MyAccount = ({navigation}) => {
           */}
           
            
-            <View style={{alignItems: 'center', justifyContent: 'center'}}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('MyAddresses')}>
-                <View style={styles.list}>
-                  <Icon
-                    name={'relative-scale'}
-                    type='materialcommunity'
-                    size={25}
-                    color={Colors.colors.primary}
-                  />
-                  <Text type="subheading" style={{width:'50%',textAlign:'center'}}>My Addresses</Text>
-                  <Icon
-                    name={'chevron-small-right'}
-                    size={25}
-                    
-                    color={Colors.colors.primary}
-                    type="entypo"
-                  />
-                </View>
-              </TouchableOpacity>
-            </View>
              
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
               <TouchableOpacity

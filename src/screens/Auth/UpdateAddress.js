@@ -12,6 +12,7 @@ import { isInvalidCharacters, isNonEmptyString, isPhoneNumberValid, Pincode } fr
 import Colors from '../../utils/Colors'
 import { API_URL } from '../../utils/Config'
 import Country from '../../constants/data/country.json'
+import { RNToasty } from 'react-native-toasty'
 
 const UpdateAddresss=({navigation,route})=>{
   const id=route.params.id
@@ -240,13 +241,22 @@ const UpdateAddresss=({navigation,route})=>{
                 
               }))
               if(responseJson.statusCode==0){
-                alert(responseJson.message)
+                RNToasty.Success({
+                  title:responseJson.message,
+                  position:'center'
+
+                })
+               
                 
                 
 
               }
               else{
-                alert('something went wrong')
+                RNToasty.Success({
+                  title:'Something went wrong',
+                  position:'center'
+
+                })
               }
               
               // setLoading(false);

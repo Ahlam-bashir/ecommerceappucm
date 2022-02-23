@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  useWindowDimensions,
+ 
   Alert
 } from 'react-native';
 
@@ -32,13 +32,12 @@ import ReviewModal from '../../components/picker/ReviewModal';
 import { useDispatch } from 'react-redux';
 import { addToWishlist } from '../../store/actions/wishlistActions';
 import { RNToasty } from 'react-native-toasty';
+import { EventEmitter } from 'react-native';
+import { AppState } from 'react-native';
 
 const ProductDetails = ({navigation, route}) => {
   const dispatch=useDispatch()
   const ProductId = route.params.id;
-  console.log(ProductId)
-  const {width} = useWindowDimensions();
-
   const [user, setUser] = useState(null);
   const [price, setPrice] = useState(1);
   const [symbol, setSymbol] = useState(decode('&#X0024;'));
@@ -51,8 +50,7 @@ const ProductDetails = ({navigation, route}) => {
   const [productRating,setProductRating]=useState([])
   const [reviewVisible,setReviewVisible]=useState(false)
   const [maxRating, setMaxRating] = useState([1, 2, 3, 4, 5]);
- 
-  const [mainImage, setMainImage] = useState('');
+   const [mainImage, setMainImage] = useState('');
   const [alertVisible, setAlertVisible] = useState(false);
   const [animation, setAnimation] = useState('');
   const [title, setTitle] = useState('');
@@ -62,7 +60,7 @@ const ProductDetails = ({navigation, route}) => {
   const [imageIndex,setImageIndex]=useState(null)
   
   const [zoomerVisible,setZoomerVisible]=useState(false)
-  let zommer=[]
+  
   //const entities = new Html5Entities()
   useEffect(async () => {
     await AsyncStorage.getItem('user')
@@ -81,7 +79,7 @@ const ProductDetails = ({navigation, route}) => {
       .catch(error => {
         console.log(error);
       });
-  }, []);
+    }, []);
   useEffect(async() => {
     setVisible(true);
   await fetch(API_URL + 'Products/' + ProductId, {
@@ -125,17 +123,13 @@ const ProductDetails = ({navigation, route}) => {
       });
       return ()=>setProductDetails(null)
   }, []);
-  let images=productImages.map((img)=>{
-       return {url:img}
-  })
-  useEffect(async ()=>{
+   useEffect(async ()=>{
    await fetch(API_URL + 'ProductRating/' + ProductId, {
       method: 'GET',
       //Request Type
     })
       .then(response => response.json())
       .then(responseJson => { 
-        console.log(responseJson.message + "ratings and reviews")
         if (responseJson.statusCode === 0) {
           setVisible(false);
           console.log(responseJson.totalStars+'rattt')
@@ -153,6 +147,10 @@ const ProductDetails = ({navigation, route}) => {
       return ()=>setProductRating([])
      
   },[ratingsreviews])
+  let images=productImages.map((img)=>{
+    return {url:img}
+})
+
   const details = () => {
     if (disableDetails) setDisableDetails(false);
     else if (disableDetails === false) {
@@ -377,7 +375,7 @@ const ProductDetails = ({navigation, route}) => {
              {productRating.map((item,key)=>{
                  return (
                    <>
-                   <Text>{item.User.firstName}</Text>
+                   <Text key={key}>{item.User.firstName}</Text>
                   <Icon
                   size={30}
                   style={styles.starImageStyle}
@@ -403,17 +401,9 @@ const ProductDetails = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <CustomHeader customStyles={styles.svgCurve} />
-      <ReviewModal
-        visible={reviewVisible}
-        close={()=>setReviewVisible(!reviewVisible)}
-        productId={ProductId}
-        user={user}
-
-      />
-      
-      <CustomAlert
+    <SafeAreaView style={{flex:1}}>
+     
+       <CustomAlert
         visible={alertVisible}
         close={() => setAlertVisible(false)}
         title={title}
@@ -433,7 +423,8 @@ const ProductDetails = ({navigation, route}) => {
         }
          }
       />
-        <Modal visible={zoomerVisible} 
+       
+       <Modal visible={zoomerVisible} 
   transparent={true} 
   onRequestClose={()=>setZoomerVisible(false)}
   
@@ -465,13 +456,7 @@ const ProductDetails = ({navigation, route}) => {
     </TouchableOpacity>            
    
    )}
-  /*renderHeader={(index)=>{
-    <TouchableOpacity  key={index} style={{padding:10,height:20,width:40}} onPress={()=>setZoomerVisible(false)}>
-    <Icon  name='clear' size={20} color={Colors.colors.white}/>
-    </TouchableOpacity>            
-   
-   
-  }}*/
+  
   
   
 />
@@ -481,7 +466,9 @@ const ProductDetails = ({navigation, route}) => {
 </Modal>
 
       <Loader loading={visible} />
-      <View
+
+       <CustomHeader customStyles={styles.svgCurve} />
+       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -506,9 +493,16 @@ const ProductDetails = ({navigation, route}) => {
           onPress={() => navigation.navigate('CartScreenStack')}
         />
       </View>
-      
+     
+      {productDetails!==null? 
+       <ScrollView>
+          <ReviewModal
+        visible={reviewVisible}
+        close={()=>setReviewVisible(!reviewVisible)}
+        productId={ProductId}
+        user={user}
 
-      <ScrollView>
+      />
         <View style={styles.main}>
           <View>
           {user!=null?
@@ -550,7 +544,7 @@ const ProductDetails = ({navigation, route}) => {
             />
           
           </View>
-        {productDetails!==null?      
+           
          <View
             style={{
               width: '100%',
@@ -666,7 +660,7 @@ const ProductDetails = ({navigation, route}) => {
             {!highligths ? (
               <View style={{padding: 10}}>
                 <RenderHTML
-                  contentWidth={width}
+                  contentWidth={DIMENS.common.WINDOW_WIDTH}
                   source={{html: decode(productDetails.product.highlights)}}
                 />
               </View>
@@ -713,8 +707,8 @@ const ProductDetails = ({navigation, route}) => {
             {!disableDetails ? (
               <View style={{alignItems: 'center', padding: 10}}>
                 <RenderHTML
-                  contentWidth={width}
-                  source={{html: decode(productDetails.product.description)}}
+                   contentWidth={DIMENS.common.WINDOW_WIDTH}
+                   source={{html: decode(productDetails.product.description)}}
                 />
               </View>
             ) : null}
@@ -852,9 +846,9 @@ const ProductDetails = ({navigation, route}) => {
 
             </View>
           </View>
-   :null}  
+  
         </View>
-      </ScrollView>
+      </ScrollView>:null}
       <View
         style={{
           flexDirection: 'row',
@@ -901,8 +895,14 @@ const ProductDetails = ({navigation, route}) => {
           </View>
         </TouchableOpacity>
       </View>
+
+     
+      
+
+
     </SafeAreaView>
-  );
+
+   );
 };
 export default ProductDetails;
 const styles = StyleSheet.create({

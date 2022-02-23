@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import {useEffect} from 'react';
 import {View, StyleSheet, Image} from 'react-native';
@@ -5,7 +6,11 @@ import {Text} from '../../components';
 import Colors from '../../utils/Colors';
 
 const SplashScreen = ({navigation}) => {
-  useEffect(() => {
+  
+  
+  useEffect(async() => {
+    
+
     setTimeout(() => {
       //Check if user_id is set or not
       //If not then send for Authentication

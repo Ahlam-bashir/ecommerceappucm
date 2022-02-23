@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useCallback, useState} from 'react'
 import {
     View,
     StyleSheet,
@@ -27,7 +27,7 @@ import WishIcon from './WishlIcon';
 
 
 
-const ArrivalList=(props)=>{
+const ArrivalList =(props)=> {
   const dispatch=useDispatch()
   const [maxRating, setMaxRating] = useState([1, 2, 3, 4, 5]);
  
@@ -85,10 +85,10 @@ const ArrivalList=(props)=>{
       <TouchableOpacity
       key
       ={item.product.id}
-        onPress={() =>
+        onPress={useCallback(() =>
           navigation.navigate('productDetails', {
             id: item.product.id,
-          })
+          }),[item.product.id])
         }>
         <View
           key={item.id}
@@ -104,7 +104,7 @@ const ArrivalList=(props)=>{
             backgroundColor: Colors.colors.white,
             borderRadius: 14,
           }}>
-        
+      
           <FastImage
           resizeMode={FastImage.resizeMode.contain}
             style={{
@@ -116,6 +116,8 @@ const ArrivalList=(props)=>{
             }}
             
           />
+        
+         
               {user!=null?<WishIcon item={item} user={user}/>
         
        :null}

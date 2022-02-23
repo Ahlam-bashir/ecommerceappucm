@@ -52,13 +52,13 @@ const CartScreen = ({navigation}) => {
   const [counter,setCounter]=useState(1)
   let sum = 0;
   useEffect(() => {
-    navigation.addListener('focus', async () => {
+   navigation.addListener('focus', async () => {
       await AsyncStorage.getItem('currency')
         .then(value => JSON.parse(value))
         .then(json => {
           if (json !== null) {
             setPrice(json.conversion_rate);
-            console.log(json);
+           
             setSymbol(String.fromCharCode(parseInt(json.target_data.display_symbol, 16)))
        
            // setSymbol('&#X' + json.target_data.display_symbol + ';');
@@ -67,19 +67,20 @@ const CartScreen = ({navigation}) => {
         .catch(error => {
           console.log(error);
         });
-      // cartDetails()
+       
+     
     });
-  });
+  },[]);
 
   // const use=loggedInUser()
 
   useEffect(async () => {
-     //  cartDetails();
+       cartDetails();
     navigation.addListener('focus',async ()=>{
       await cartDetails();
 
     })
-   // return ()=> setCartData([]);
+   
     // AsyncStorage.getItem
    
 
@@ -364,6 +365,56 @@ const CartScreen = ({navigation}) => {
     
     
   }
+  const renderCartItem=({item})=>{
+    let convertPrice = item.userCart.price * price;
+    sum = sum + convertPrice;
+
+    return  (
+      <TouchableOpacity onPress={()=>navigation.navigate('productDetails', {
+        id: item.userCart.productId,
+      })}>
+      <View style={styles.outerContainer}>
+        
+          <Icon
+            name="minuscircleo"
+            type="antdesign"
+            size={24}
+            color={Colors.colors.gray400}
+            onPress={() => removeFrommCart(item.userCart)}
+          />
+        
+        <Image
+          source={{uri: item.mainImage}}
+          resizeMode="cover"
+          style={{height: 100, width: 120, margin: 10}}
+        />
+        <View style={{flexDirection: 'column'}}>
+          <Text type="caption" style={{width: 80}}>
+            {item.userCart.productName}
+          </Text>
+
+          <Text>{decode(symbol) + convertPrice.toFixed(2)}</Text>
+          <Icon  name='clear' size={16} color={Colors.colors.gray500}        />
+          <Text>Qyt: {item.userCart.quantity}</Text>
+        </View>
+        <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
+          <TouchableOpacity onPress={()=>decrementCart(item.userCart)}>
+        <View style={styles.quantityContainer}>
+          <Icon name='minus' type='antdesign' size={10}/>
+        </View>
+        </TouchableOpacity>
+        <Text>{item.userCart.quantity}</Text>
+        <TouchableOpacity onPress={()=>incrementCart(item.userCart)}>
+        <View style={styles.quantityContainer}>
+          <Icon name='plus' type='antdesign'  size={10}/>
+        </View>
+        </TouchableOpacity>
+        </View>
+      </View>
+      </TouchableOpacity>
+    ) 
+
+  }
   const ListEmptyComponent=()=>{
     return(
       <View style={{justifyContent:'center',alignItems:'center',minHeight:'100%'}}>
@@ -441,57 +492,8 @@ const CartScreen = ({navigation}) => {
           onRefresh={onRefresh}
           ListEmptyComponent={ListEmptyComponent}
           refreshing={refreshing}
-          renderItem={({item}) => {
-         //   console.log('item' + item.userCart.price);
-            // setTotal(item.userCart.total)
-            let convertPrice = item.userCart.price * price;
-            sum = sum + convertPrice;
- 
-            return  (
-              <TouchableOpacity onPress={()=>navigation.navigate('productDetails', {
-                id: item.userCart.productId,
-              })}>
-              <View style={styles.outerContainer}>
-                
-                  <Icon
-                    name="minuscircleo"
-                    type="antdesign"
-                    size={24}
-                    color={Colors.colors.gray400}
-                    onPress={() => removeFrommCart(item.userCart)}
-                  />
-                
-                <Image
-                  source={{uri: item.mainImage}}
-                  resizeMode="cover"
-                  style={{height: 100, width: 120, margin: 10}}
-                />
-                <View style={{flexDirection: 'column'}}>
-                  <Text type="caption" style={{width: 80}}>
-                    {item.userCart.productName}
-                  </Text>
- 
-                  <Text>{decode(symbol) + convertPrice.toFixed(2)}</Text>
-                  <Icon  name='clear' size={16} color={Colors.colors.gray500}        />
-                  <Text>Qyt: {item.userCart.quantity}</Text>
-                </View>
-                <View style={{flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
-                  <TouchableOpacity onPress={()=>decrementCart(item.userCart)}>
-                <View style={styles.quantityContainer}>
-                  <Icon name='minus' type='antdesign' size={10}/>
-                </View>
-                </TouchableOpacity>
-                <Text>{item.userCart.quantity}</Text>
-                <TouchableOpacity onPress={()=>incrementCart(item.userCart)}>
-                <View style={styles.quantityContainer}>
-                  <Icon name='plus' type='antdesign'  size={10}/>
-                </View>
-                </TouchableOpacity>
-                </View>
-              </View>
-              </TouchableOpacity>
-            ) 
-          }}
+          renderItem={renderCartItem}
+      
         />
         
       
