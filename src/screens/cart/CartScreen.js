@@ -85,7 +85,7 @@ const CartScreen = ({navigation}) => {
    
 
     //return ()=>console.log('unmounting')
-  }, [dispatch]);
+  }, []);
   const cartDetails = async () => {
           setLoading(true);
           
@@ -418,7 +418,19 @@ const CartScreen = ({navigation}) => {
   const ListEmptyComponent=()=>{
     return(
       <View style={{justifyContent:'center',alignItems:'center',minHeight:'100%'}}>
-      <Text type='heading'>Your Cart is Empty</Text>
+      <Text type='heading' style={{color:Colors.colors.primary,padding:12,fontWeight:'bold'}}>Your Cart is Empty</Text>
+      <Icon type='materialcommunity' name='cart-outline'  color={Colors.colors.primary}
+      size={100}/>
+      <TouchableOpacity 
+      onPress={()=>navigation.navigate('HomeScreenStack')}
+       style={{...styles.checkoutContainer,marginTop:12,position:'absolute',bottom:28}}>
+      <Text type="subheading" style={{color: Colors.colors.white}}>
+        {StringsOfLanguages.ContinueShop}
+      </Text>
+    </TouchableOpacity>
+  
+
+
       </View>
     )
   }
@@ -447,7 +459,7 @@ const CartScreen = ({navigation}) => {
   const ListHeaderComponent=()=>{
     return(
       <TouchableOpacity 
-      onPress={()=> dispatch(removeCart())}
+      onPress={()=>dispatch(removeCart())}
       
       style={{width:'100%',alignItems:'flex-end',top:0,padding:6,justifyContent:'center', marginTop:Platform.OS=='android'?28:0}}>
         <View style={{flexDirection:'row',alignItems:'center'}}>
@@ -475,26 +487,29 @@ const CartScreen = ({navigation}) => {
 
       <View style={styles.main}>
         <Text
-          type="heading"
-          style={{alignSelf: 'center', color: Colors.colors.white, top: 16}}>
+          type="subheading"
+          style={styles.heading}>
           {' '}
           Your Cart
         </Text>
         {carts.length!==0?<ListHeaderComponent/>:null}
     
         {loading? <Loader loading={loading} />:null}
-          <FlatList
-          data={carts}
-         // ListHeaderComponent={carts.length!==0? ListHeaderComponent:null}
-          contentContainerStyle={{marginTop: 12,paddingBottom:28,backgroundColor:Colors.colors.transparent}}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(id, index) => index.toString()}
-          onRefresh={onRefresh}
-          ListEmptyComponent={ListEmptyComponent}
-          refreshing={refreshing}
-          renderItem={renderCartItem}
-      
-        />
+        {carts.length==0?
+        <ListEmptyComponent/>
+        :  <FlatList
+        data={carts}
+       // ListHeaderComponent={carts.length!==0? ListHeaderComponent:null}
+        contentContainerStyle={{marginTop: 12,paddingBottom:28,backgroundColor:Colors.colors.transparent}}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(id, index) => index.toString()}
+        onRefresh={onRefresh}
+       // ListEmptyComponent={ListEmptyComponent}
+        refreshing={refreshing}
+        renderItem={renderCartItem}
+    
+      />}
+        
         
       
 
@@ -561,6 +576,13 @@ const styles = StyleSheet.create({
     alignItems:'center',
     backgroundColor:Colors.colors.gray200,
     margin:4
-  }
-
+  }, heading: {
+    color: Colors.colors.white,
+    alignSelf: 'center',
+  },
+  text: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    //top: 40,
+  },
 });

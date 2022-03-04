@@ -84,8 +84,7 @@ const ExpandableComponent = ({item, onClickFunction, navigation}) => {
             key={key}
             style={styles.content}
             onPress={() => onChange(item.id, item.val)}>
-            <Text style={styles.text}>{item.val}</Text>
-            <View style={styles.separator} />
+            <Text type='caption' style={{padding:6}}>{item.val}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -115,15 +114,21 @@ const aboutus = ({navigation}) => {
     setListDataSource(array);
   };
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{flex:1}}>
       <CustomHeader customStyles={styles.svgCurve} />
-
-      <View style={styles.main}>
-        <View style={styles.text}>
+      <View style={styles.text}>
           <Text type="subheading" style={styles.heading}>
             About Us
           </Text>
         </View>
+    
+    
+      <View style={styles.main}>
+     
+     
+     
+
+        
         <ScrollView contentContainerStyle={{paddingBottom: 100, flexGrow: 1}}>
           <View style={styles.container}>
             <ScrollView>
@@ -145,10 +150,10 @@ const aboutus = ({navigation}) => {
             alignItems: 'center',
             position: 'absolute',
             width: '100%',
-            bottom: 0,
+            bottom: 30,
           }}>
           <Text type="subheading" style={{color: Colors.colors.primary}}>
-            Follow Us at
+            Follow us at
           </Text>
           <View style={styles.socialContainer}>
             <SocialIcon
@@ -209,11 +214,12 @@ const styles = StyleSheet.create({
   main: {
     height: DIMENS.common.WINDOW_HEIGHT - 160,
     width: DIMENS.common.WINDOW_WIDTH,
+    marginTop:24
   },
   text: {
     alignItems: 'center',
     justifyContent: 'center',
-    top: 20,
+   // top: 20,
   },
   heading: {
     color: Colors.colors.white,
@@ -255,11 +261,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginRight: 16,
   },
-  text: {
-    fontSize: 16,
-    color: '#606070',
-    padding: 10,
-  },
+  
   content: {
     paddingLeft: 10,
     paddingRight: 10,

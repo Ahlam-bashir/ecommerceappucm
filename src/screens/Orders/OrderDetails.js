@@ -7,6 +7,8 @@ import {SafeAreaView} from 'react-native';
 import {FlatList} from 'react-native';
 import {View, StyleSheet, Image, ScrollView,TouchableOpacity} from 'react-native';
 import {CustomHeader, Icon, Loader, Text} from '../../components';
+import CancelOrderModal from '../../components/picker/CancelOrderModal';
+import ReturnOrderModal from '../../components/picker/RetrunOrderModal';
 import {DIMENS} from '../../constants';
 import {Conversion} from '../../utils';
 import Colors from '../../utils/Colors';
@@ -15,6 +17,22 @@ import VerticalStepIndicator from './Components/VerticalStepIndicator';
 
 const OrderDetails = ({navigation, route}) => {
   const id = route.params.id;
+  var obj = {
+    active:"Placed",
+    cancelled:1,
+    returned:2,
+    refund:3,
+    underProcess:4,
+    refundInitiated:5,
+    refundCompleted:6,
+    returnInitiated:7,
+    returnCompleted:8,
+    shipped:9,
+    delivered:"Delivered",
+    completed:11,
+    returnCancelled:12,
+    refundCancelled:13
+ }
   console.log(id);
   const [orders, setorders] = useState([]);
   const [items, setItems] = useState([]);
@@ -22,6 +40,13 @@ const OrderDetails = ({navigation, route}) => {
   const [symbol, setSymbol] = useState(decode('&#X0024;'));
   const [tracking, setTracking] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [orderVisible,setOrderVisible]=useState(false)
+  const [orderId,setOrderId]=useState('')
+  const [productId,setProductId]=useState('')
+  const [returnVisible,setReturnVisible]=useState(false)
+  const [returnDate,setReturnDate]=useState('')
+  const today=new Date().toISOString().slice(0, 10)
+
   useEffect(async () => {
     await AsyncStorage.getItem('currency')
       .then(txt => JSON.parse(txt))
@@ -36,7 +61,7 @@ const OrderDetails = ({navigation, route}) => {
       });
 
     orderDetails();
-  }, []);
+  }, [orderVisible,returnVisible]);
 
   const orderDetails = async () => {
     setLoading(true);
@@ -75,6 +100,21 @@ const OrderDetails = ({navigation, route}) => {
         }
       });
   };
+  const openCancelModel=(orderId,productId)=>{
+    setOrderId(orderId)
+    setProductId(productId)
+
+
+    setOrderVisible(true)
+
+  }
+  const openReturnModel=(orderId,productId)=>{
+    setOrderId(orderId)
+    setProductId(productId)
+    setReturnVisible(true)
+
+  }
+  
   const renderItem=({item})=>{
     let convertPrice = item.OrderItems.Products.price * price;
     return (
@@ -107,15 +147,54 @@ const OrderDetails = ({navigation, route}) => {
             Quantity: {item.OrderItems.quantity}
           </Text>
         </View>
+        {item.OrderItems.Orders.isPaid==true && item.OrderItems.Orders.status==obj.active?
+         <TouchableOpacity 
+         onPress={()=>openCancelModel(item.OrderItems.orderId,item.OrderItems.id)} 
+         style={styles.checkoutContainer}>
+                 <Text type="subheading" style={{color: Colors.colors.error}}>
+                   {'Cancel'}
+                 </Text>
+               </TouchableOpacity> :
+               item.OrderItems.Orders.isPaid==true && item.OrderItems.Orders.status==obj.delivered
+                        && returnDate<=today
+               ?
+                <TouchableOpacity 
+                onPress={()=>openReturnModel(item.OrderItems.orderId,item.OrderItems.id)} 
+                style={styles.checkoutContainer}>
+                        <Text type="subheading" style={{color: Colors.colors.error}}>
+                          {'Return'}
+                        </Text>
+                      </TouchableOpacity>:null
+
+        }
+       
       </View>
+      
       </TouchableOpacity>
     );
  
   }
+  
 
   return (
     <SafeAreaView style={{flex:1}}>
        <CustomHeader customStyles={styles.svgCurve} />
+       <CancelOrderModal
+        visible={orderVisible}
+        close={()=>setOrderVisible(!orderVisible)}
+        orderId={orderId}
+        itemId={productId}
+        
+       
+       />
+        <ReturnOrderModal
+        visible={returnVisible}
+        close={()=>setReturnVisible(!returnVisible)}
+        orderId={orderId}
+        itemId={productId}
+        
+       
+       />
        <View style={styles.header}>
             <Icon
               name="arrowleft"
@@ -192,21 +271,39 @@ const OrderDetails = ({navigation, route}) => {
                 )}
               </Text>
             </View>
-            
-            {tracking.map((element, index) => {
-              return (
-                <View key={index} style={styles.details}>
-                  <Text type="caption">Status</Text>
-                  <Text type="caption">{element.trackingComment}</Text>
-                </View>
-              );
-              
+            {tracking.map(item=>{
+              if(item.status=='Delivered'){
+                let date=new Date(item.dated)
+               
+                setReturnDate(date.setDate(date.getDate() + 7))
+
+
+                   
+              }
             })}
-            <VerticalStepIndicator data={tracking}/>
+            
+            <VerticalStepIndicator 
+            data={tracking}
+            />
           </View>
          
         </View>
       </ScrollView>
+      {orders.isPaid && orders.status==obj.active?
+       <TouchableOpacity 
+       onPress={()=>openCancelModel(orders.id,'')} 
+       style={{...styles.checkoutContainer,alignItems:'center',backgroundColor:Colors.colors.primary,alignSelf:'center',width:'90%'}}>
+               <Text type="subheading" style={{color: Colors.colors.white}}>
+                 {'Cancel'}
+               </Text>
+             </TouchableOpacity>:orders.isPaid && orders.status==obj.delivered && returnDate<=today?<TouchableOpacity 
+       onPress={()=>openReturnModel(orders.id,'')} 
+       style={{...styles.checkoutContainer,alignItems:'center',backgroundColor:Colors.colors.primary,alignSelf:'center',width:'90%'}}>
+               <Text type="subheading" style={{color: Colors.colors.white}}>
+                 {'Return'}
+               </Text>
+             </TouchableOpacity>:null}
+     
     </SafeAreaView>
   );
 };
@@ -231,5 +328,16 @@ const styles = StyleSheet.create({
     height: 30,
     flexDirection: 'row',
     width: '100%',
+  },
+  checkoutContainer: {
+    bottom: 6,
+   
+    width: '80%',
+    height: 40,
+    borderRadius: 12,
+    //alignSelf: 'center',
+    padding: 6,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
   },
 });

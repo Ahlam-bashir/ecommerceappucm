@@ -23,6 +23,10 @@ import { BASE_URL } from '../../../constants/matcher';
 import {decode} from 'html-entities';
 import { Alert } from 'react-native';
 import WishIcon from './WishlIcon';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_URL } from '../../../utils/Config';
+import { encode } from 'base-64';
+import { RNToasty } from 'react-native-toasty';
 
 
 
@@ -80,6 +84,152 @@ const ArrivalList =(props)=> {
         </View>
       );
     };
+    const addtProductToCart = async item => {
+  
+      // addToCart(item.product.id)
+      const productId = item.product.id;
+  
+      let existingCart = await AsyncStorage.getItem('products').then(value => {
+        return JSON.parse(value);
+      });
+  
+      // console.log(item.product)
+      var data = {
+        userCart: {
+          productId: item.product.id,
+          sellerId: item.product.sellerId,
+          price: item.product.price,
+          quantity: 1,
+          total: '',
+          productName: item.product.name,
+          agentId: null,
+          variationId: 0,
+          deliveryTypeId: null,
+          isBuynow: false,
+        },
+        mainImage: item.mainImage,
+      };
+      if (user === null) {
+        if (existingCart !== null && existingCart.length!==0) {
+          console.log(existingCart+'existi');
+  
+          // We have a cart already, now we have to check if any item in cart is the same as our cartItem; existingCart should be kept as an array
+             let flag=0
+          existingCart.forEach((product, index) => {
+            console.log(product.userCart.productId + '   '+   item.product.id +'insidevfor')
+            if (product.userCart.productId == item.product.id ){
+            // product.ItemCode == cartItem.ColorCode) {
+            // you can modify this condition by your needs
+            
+                existingCart[index].userCart.quantity += 1
+                flag=1
+                console.log('added quantity')
+                console.log(existingCart[index].userCart.quantity)
+           }
+            
+          });
+          if(flag==0) {
+            // the item doesn't match any items, therefore we add it to the cart
+           
+            existingCart.push(data);
+            console.log('if block');
+            }
+        } else {
+          //console.log(existingCart)
+          // the cart is empty, therefore we put the first item in it
+          existingCart = [data];
+          console.log('else block..');
+        }
+  
+        AsyncStorage.setItem('products', JSON.stringify(existingCart));
+        RNToasty.Success({
+          title:'Product added to cart',
+          position:'center'
+        })
+       
+      } else {
+        console.log('else block');
+        addToCart(productId);
+      }
+    };
+    const addToCart = id => {
+      console.log('hello' + id);
+      //setLoading(true);
+      fetch(API_URL+ 'MyCart', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Basic ' + encode(user.email + ':' + user.password),
+        },
+        body: JSON.stringify({
+          productId: id, //Product Id
+          quantity: 1,
+          agentId: 0,
+          variationId: null,
+        }),
+      })
+        .then(response => response.json())
+        .then(responseJson => {
+        
+         // setLoading(false);
+          //setAlertVisible(true);
+          RNToasty.Success({
+            title:'Product' + '  ' + responseJson.message + '  ' + 'to Cart',
+            position:'center'
+          })
+         
+       /*   Alert.alert(
+            //title
+            'Success',
+            //body
+            'Product' + '  ' + responseJson.message + '  ' + 'to Cart',
+            [
+              {
+                text: StringsOfLanguages.ContinueShop,
+                onPress: () => {return},
+              },
+              {
+                text: 'Go to Cart',
+                onPress: () => navigation.navigate('CartScreenStack'),
+                style: 'cancel',
+              },
+            ],
+            {cancelable: false},
+            //clicking out side of alert will not cancel
+          );*/
+          //Showing response message coming from server
+          console.log(responseJson);
+          
+         // setAlertVisible(true)
+          
+  
+       //  alert('Product' + '  ' + responseJson.message + '  ' + 'to Cart');
+          /* SweetAlert.showAlertWithOptions({
+            title: '',
+            subTitle: '',
+            confirmButtonTitle: 'OK',
+            confirmButtonColor: '#000',
+            otherButtonTitle: 'Cancel',
+            otherButtonColor: '#dedede',
+            style: 'success',
+            Icon: 'success',
+            cancellable: true
+  
+          },
+          callback => console.log('callback')
+          
+          ):*/
+          // setLoading(false)
+        })
+        .catch(error => {
+          //display error message
+         // setLoading(false);
+  
+          console.warn(error);
+        });
+    };
+    
   
     return (
       <TouchableOpacity
@@ -100,6 +250,7 @@ const ArrivalList =(props)=> {
             marginHorizontal: 5,
             marginVertical: 5,
             width: (DIMENS.common.WINDOW_WIDTH * 45) / 100,
+            padding:6,
 
             backgroundColor: Colors.colors.white,
             borderRadius: 14,
@@ -121,12 +272,15 @@ const ArrivalList =(props)=> {
               {user!=null?<WishIcon item={item} user={user}/>
         
        :null}
+       <View
+       style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}
+       >
           <View
             style={{
               padding: 6,
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              width: (DIMENS.common.WINDOW_WIDTH * 45) / 100,
+             // flexDirection: 'column',
+             // alignItems: 'center',
+              width: (DIMENS.common.WINDOW_WIDTH * 40) / 100,
             }}>
             <Text
               type="caption"
@@ -165,6 +319,33 @@ const ArrivalList =(props)=> {
             )}
             <CustomRatingBar />
           </View>
+        </View>
+        <TouchableOpacity style={{
+            height: 40,
+            width: 40,
+            borderRadius: 40 / 2,
+            backgroundColor: Colors.colors.primary,
+            alignSelf: 'flex-end',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin:10,
+            
+            position:'absolute',
+            bottom:2,
+            right:2
+          
+          }}
+          onPress={() => addtProductToCart(item)}
+          >
+          
+          <Icon
+            name="add-shopping-cart"
+            size={20}
+            color={Colors.colors.white}
+            onPress={() => addtProductToCart(item)}
+          />
+       </TouchableOpacity>
+        
         </View>
       </TouchableOpacity>
     );

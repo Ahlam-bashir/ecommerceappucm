@@ -269,7 +269,7 @@ useEffect(async()=>{
     console.log('patment shet');
     setLoading(true);
 
-    console.log(grandTotal+ 'fetchpraams') ;
+    console.log(grandTotal+ 'fetchpraams' +total + sum + orderId) ;
     if (orderId === null || total == 0 || sum == 0) {
      
       setLoading(false);

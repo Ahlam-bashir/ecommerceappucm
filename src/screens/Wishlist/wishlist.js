@@ -110,6 +110,17 @@ const wishlist=({navigation})=>{
               console.warn(error);
             });
     }
+    const deleteFronCart=(id)=>{
+      dispatch(removeFromWishlist(id))
+      RNToasty.Error({
+        title:'Product Sucessfully removed from wislist',
+        position:'center'
+        
+      })
+
+
+      
+    }
     return(
         <SafeAreaView style={{flex:1,paddingBottom:30}}>
             <CustomHeader  customStyles={styles.header}/>
@@ -163,7 +174,7 @@ const wishlist=({navigation})=>{
                                     />
                                      </TouchableOpacity>
                                    
-                                     <TouchableOpacity style={styles.circle}     onPress={()=>dispatch(removeFromWishlist(item.wishlist.id))}
+                                     <TouchableOpacity style={styles.circle}     onPress={()=>deleteFronCart(item.wishlist.id)}
                                  >
                                       <Icon 
                                      name="delete"

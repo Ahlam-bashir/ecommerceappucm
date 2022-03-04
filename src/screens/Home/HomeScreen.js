@@ -203,7 +203,7 @@ const HomeScreen = ({navigation}) => {
       setSlides([]);
       setData([]);
     };
-  }, [cat]);
+  }, [cat,dispatch]);
   useEffect(() => {
     getData();
     return () => {
@@ -291,11 +291,10 @@ const HomeScreen = ({navigation}) => {
         <SliderBox
           key={slidesArray.id}
           images={slidesArray}
-          sliderBoxHeight={140}
+          sliderBoxHeight={70}
           resizeMethod={'resize'}
           resizeMode={'contain'}
-          autoplay
-          
+          autoplay  
           onCurrentImagePressed={index => bannerClick(index)}
           dotColor={Colors.colors.primary}
           inactiveDotColor={Colors.colors.gray400}
@@ -304,9 +303,8 @@ const HomeScreen = ({navigation}) => {
           dotStyle={{
             width: 18,
             height: 5,
-
             padding: 0,
-            margin: 0,
+            marginTop: 0,
           }}
         />
         <View style={styles.categoryHeading}>
@@ -503,6 +501,8 @@ const HomeScreen = ({navigation}) => {
                 flexGrow: 1,
                 backgroundColor: Colors.colors.white,
                 padding: 10,
+                paddingTop:0
+               
               }}>
               <FlatList
                 refreshing={refreshing}

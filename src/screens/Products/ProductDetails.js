@@ -29,7 +29,7 @@ import StringsOfLanguages from '../../constants/StringOfLanguages';
 import { Modal } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import ReviewModal from '../../components/picker/ReviewModal';
-import { useDispatch } from 'react-redux';
+import { useDispatch ,useSelector} from 'react-redux';
 import { addToWishlist } from '../../store/actions/wishlistActions';
 import { RNToasty } from 'react-native-toasty';
 import { EventEmitter } from 'react-native';
@@ -58,6 +58,7 @@ const ProductDetails = ({navigation, route}) => {
   const [btntext2, setbtntext2] = useState('');
   const [ratingsreviews,setratingsreviews]=useState(true)
   const [imageIndex,setImageIndex]=useState(null)
+  const carts=useSelector(state => state.cart.cartItems.length)
   
   const [zoomerVisible,setZoomerVisible]=useState(false)
   
@@ -485,13 +486,19 @@ const ProductDetails = ({navigation, route}) => {
         <Text type="subheading" style={{color: Colors.colors.white}}>
           Details
         </Text>
+        <View style={{alignItems:'center',justifyContent:'center'}}>
         <Icon
           name="shoppingcart"
           type="antdesign"
           size={30}
           color={Colors.colors.white}
           onPress={() => navigation.navigate('CartScreenStack')}
+
         />
+        <View style={{height:20,width:20,backgroundColor:Colors.colors.error,alignItems:'center',justifyContent:'center',top:-14,left:18,position:'absolute',borderRadius:20/2}}>
+        <Text type='caption' style={{color:Colors.colors.white}}>{carts}</Text>
+        </View>
+      </View>
       </View>
      
       {productDetails!==null? 

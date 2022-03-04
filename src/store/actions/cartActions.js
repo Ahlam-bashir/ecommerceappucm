@@ -259,7 +259,32 @@ export const removeCart=()=>{
     
             console.warn(error);
           });
-        }})
+        }else{
+          AsyncStorage.getItem('products')
+          .then(value => JSON.parse(value))
+          .then(async json => {
+            // setLoading(false);
+
+
+            if (json != null) {
+               await AsyncStorage.setItem('products',JSON.stringify([]))
+              await dispatch({
+                type: REMOVE_ALL_FROM_CART,
+                cartItems: [],
+              });
+              //console.log(json)
+
+              //setDisable(false);
+              //setRefreshing(false);
+            } 
+            console.log(json);
+          });
+
+        }
+
+        
+      }
+       )
 
 
   }

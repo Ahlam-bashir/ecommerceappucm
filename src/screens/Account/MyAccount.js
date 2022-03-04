@@ -166,7 +166,7 @@ const MyAccount = ({navigation}) => {
                 color={Colors.colors.primary}
                 type='feather'
               />
-              <Text type="subheading">SignIn</Text>
+              <Text type="subheading">{'Log in'}</Text>
               <Icon
                 name={'chevron-small-right'}
                 size={25}
@@ -184,7 +184,7 @@ const MyAccount = ({navigation}) => {
                 color={Colors.colors.primary}
                 type='feather'
               />
-              <Text type="subheading" style={{width:'50%',textAlign:'center'}}>{StringsOfLanguages.SignOut}</Text>
+              <Text type="subheading" style={{width:'50%',textAlign:'center'}}>{StringsOfLanguages.textLogout}</Text>
               <Icon
                 name={'chevron-small-right'}
                 size={25}

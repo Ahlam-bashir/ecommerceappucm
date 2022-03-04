@@ -3,6 +3,7 @@ import { StyleSheet, View,  FlatList } from 'react-native';
 import StepIndicator from 'react-native-step-indicator';
 import { Text } from '../../../components';
 import dummyData from './data';
+import Moment from 'moment'
 
 const stepIndicatorStyles = {
   stepIndicatorSize: 30,
@@ -36,6 +37,7 @@ export default function VerticalStepIndicator(props) {
       <View style={styles.rowItem}>
         <Text type='subheading' style={styles.title}>{item.statusName}</Text>
         <Text style={styles.body}>{item.trackingComment}</Text>
+        <Text style={styles.body}>{Moment(item.dated).format('DD-MM-YYYY')}</Text>
       </View>
     );
   };

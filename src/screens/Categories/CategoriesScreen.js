@@ -62,7 +62,7 @@ const ExpandableComponent = ({item, onClickFunction, navigation}) => {
             key={key}
             style={styles.content}
             onPress={() => onChange(item.id)}>
-            <Text style={styles.text}>{item.subCategoryName}</Text>
+            <Text type='caption' style={{...styles.text,padding:12}}>{item.subCategoryName}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -114,17 +114,19 @@ const CategoriesScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.main}>
         <CustomHeader customStyles={styles.svgCurve} />
+        <View style={styles.text}>
         <Text
-          type="heading"
-          style={{alignSelf: 'center', color: Colors.colors.white, top: 16}}>
+          type="subheading"
+          style={styles.heading}>
           Categories
         </Text>
+        </View>
       <View style={styles.main}>
       
 
       
 
-        <View style={{marginTop:20,backgroundColor:Colors.colors.white}}>
+        <View style={{marginTop:30,backgroundColor:Colors.colors.white}}>
         <ScrollView>
               {categories.map((item, key) => (
                 <ExpandableComponent
@@ -261,5 +263,15 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 10,
     backgroundColor: Colors.colors.gray100,
+  },
+
+  text: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    //top: 40,
+  },
+  heading: {
+    color: Colors.colors.white,
+    alignSelf: 'center',
   },
 });

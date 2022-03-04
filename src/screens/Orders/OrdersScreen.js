@@ -27,7 +27,14 @@ const OrdersScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [price, setPrice] = useState(1);
   const [symbol, setSymbol] = useState(decode('&#X0024;'));
+  useEffect(()=>{
+    navigation.addListener('focus', async () => {
+      orderDetails()
+    })
+    return setOrders([])
+  },[navigation])
   useEffect(async () => {
+  
     await AsyncStorage.getItem('currency')
       .then(txt => JSON.parse(txt))
       .then(json => {
@@ -43,6 +50,7 @@ const OrdersScreen = ({navigation}) => {
       });
 
     orderDetails();
+    return setOrders([])
   }, []);
   const orderDetails = async () => {
     await AsyncStorage.getItem('user')
@@ -137,13 +145,16 @@ const OrdersScreen = ({navigation}) => {
                 }>
                 <View style={styles.orderContainer}>
                   <View style={{padding: 6}}>
-                    <View style={{flexDirection: 'row'}}>
-                      <Text type="subheading" style={{width: '50%'}}>
+                    <View style={{flexDirection: 'row',width: '75%',
+                    justifyContent:'space-between'
+                  }}>
+                      <Text type="subheading" >
                         {Moment(item.dated).format('DD-MM-YYYY')}
                       </Text>
                       <Text
                         type="subheading"
-                        style={{textAlign: 'right', width: '20%'}}>
+                        style={{textAlign:'right'}}
+                        >
                         {item.isPaid ? 'Paid' : 'Unpaid'}
                       </Text>
                     </View>
@@ -158,7 +169,8 @@ const OrdersScreen = ({navigation}) => {
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        width: '75%',
+                        width:'75%'
+                      
                       }}>
                       <Text
                         type="subheading"
@@ -167,7 +179,7 @@ const OrdersScreen = ({navigation}) => {
                       </Text>
                       <Text
                         type="caption"
-                        style={{color: Colors.colors.warning}}>
+                        style={{color: Colors.colors.warning,textAlign:'right'}}>
                         View
                       </Text>
                     </View>
@@ -195,10 +207,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
     width: '100%',
-    height: (DIMENS.common.WINDOW_HEIGHT * 1) / 5,
+   // height: (DIMENS.common.WINDOW_HEIGHT * 1) / 5,
     borderRadius: 15,
     backgroundColor: Colors.colors.white,
-    padding: 6,
+    padding: 8,
 
     flexDirection: 'row',
   },

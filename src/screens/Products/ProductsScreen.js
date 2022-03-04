@@ -230,7 +230,12 @@ const ProductScreen = ({navigation, route}) => {
         });
     } else {
       setSearchText(text)
-      getCategoryData();
+     
+     
+      getCategoryData()
+
+     
+      
     }
   };
   const addtProductToCart = async item => {
